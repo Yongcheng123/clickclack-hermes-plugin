@@ -1,0 +1,35 @@
+# Merge these sections into ~/.hermes/config.yaml.
+# Never put CLICKCLACK_BOT_TOKEN in this file.
+
+plugins:
+  enabled:
+    - clickclack-hermes
+
+gateway:
+  platforms:
+    clickclack:
+      enabled: true
+      home_channel:
+        chat_id: "channel:chn_REPLACE_ME"
+        name: "hermes-sprint"
+      extra:
+        base_url: "https://clickclack.example.com"
+        workspace_id: "wsp_REPLACE_ME"
+        default_channel_id: "chn_REPLACE_ME"
+        allowed_channel_ids:
+          - "chn_REPLACE_ME"
+
+        # For a user-owned bot, the plugin automatically allows its owner.
+        # Add IDs only if more humans should be allowed to invoke this Hermes.
+        allowed_user_ids: []
+        allow_all_users: false
+
+        # Workshop-safe defaults.
+        require_mention: true
+        allow_dms: false
+        thread_mode: "always" # always | existing | never
+        skip_history_on_first_start: true
+
+        request_timeout_seconds: 30
+        reconnect_max_seconds: 30
+

@@ -1,0 +1,19 @@
+name: clickclack-hermes
+label: ClickClack
+kind: platform
+manifest_version: 1
+version: 0.1.0
+description: >
+  A secure ClickClack messaging gateway adapter for Hermes Agent. It supports
+  channels, direct messages, Slack-style threads, durable realtime cursor
+  recovery, idempotent sends, typing indicators, and per-user/per-channel
+  access controls.
+author: Yongcheng
+license: MIT
+homepage: https://github.com/Yongcheng123/clickclack-hermes-plugin
+requires_env:
+  - name: CLICKCLACK_BOT_TOKEN
+    description: "Scoped ClickClack bot token beginning with ccb_"
+    prompt: "ClickClack bot token"
+    password: true
+
