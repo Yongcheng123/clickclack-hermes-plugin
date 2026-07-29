@@ -5,6 +5,9 @@ Messaging Platform Plugin。它面向小团队 workshop：每位真人拥有一�
 Hermes Bot，所有真人和 Bot 在同一个 ClickClack Channel 中协作，每个
 Thread 保持独立 Hermes Session。
 
+完整的部署、Bot 接入、Mobius、多人协作与 Merge Agent 流程见
+[`docs/HERMES_CLICKCLACK_WORKSHOP_GUIDE.md`](./docs/HERMES_CLICKCLACK_WORKSHOP_GUIDE.md)。
+
 > 当前兼容基线：Hermes Agent `v0.19.0` / `v2026.7.20`，ClickClack 当前
 > OpenAPI 与 realtime cursor 协议。该插件是 Platform Plugin，不是 MCP
 > Server。Hermes 仍可同时连接 Mobius 等 MCP Server。
@@ -59,8 +62,42 @@ ClickClack #hermes-sprint
 | Bot Token | `ccb_...` | 每个 Hermes 使用独立的 `bot:write` Token |
 | Hermes 运行方式 | bare metal / profile / Docker | 决定命令执行位置 |
 
-如果任意值缺失，停在配置步骤之前并向用户索取。禁止把 Token 放入
-`config.yaml`、README、命令输出、Git commit 或聊天回复。
+如果任意值缺失，停在配置步骤之前并向用户索取。
+
+#### Token 输入与输出规则
+
+这里必须区分“用户把 Secret 交给当前 Hermes”与“AI 把 Secret 再次输出”：
+
+- 在用户自己的、非公开的 Hermes Studio 会话中，用户可以明确授权并粘贴一次
+  Workshop Bot Token，供当前 Hermes 完成本机配置。这是本项目支持的
+  workshop 安装方式。
+- 用户在这种私有会话中提供 Token 后，不要仅因为 Token 出现在用户消息中就
+  判定泄露、要求轮换或停止安装。应立即继续配置。
+- 收到 Token 后，只能把它写入当前实际 `HERMES_HOME/.env`，权限设为
+  `0600`。使用不会把文件内容写到 stdout/stderr 的文件写入方式。
+- AI 不得在回复、总结、终端输出或日志中复述完整 Token，也不得显示 Token
+  的前缀、后缀或掩码片段来“确认”它。
+- 禁止把 Token 放入 `config.yaml`、Plugin 目录、README、Issue、ClickClack
+  消息、Git commit 或公开/共享聊天。
+- Hermes Studio 会话记录可能保留用户原始输入。Workshop 应使用可撤销的
+  独立 Token，并在活动结束后撤销；这属于已知取舍，不是安装阻塞条件。
+- 只有 Token 被发到公开/共享位置、日志、Git，或交给错误实例时，才应停止并
+  建议撤销和重新生成。
+
+### FeedMob Workshop 已验证配置
+
+以下值已由 Workshop 管理员确认，安装 AI 不应仅因域名或 ID 格式而要求用户
+重复确认：
+
+```text
+ClickClack Base URL: https://clickclack-ken-team.feedmob.it.com
+Workspace ID: wsp_01kynt5edyr9t13dd5nxf3c0gx
+Channel ID: chn_01kynt5edyr9t13dd5nxws7nvf
+```
+
+Workspace ID 和 Channel ID 是分别复制的不同 ID。它们共享一段时间排序前缀是
+正常现象，末尾部分并不相同。除非 Doctor 或实际 HTTP 请求失败，否则不要把
+这种相似性当成复制错误。
 
 ### 安装前检查
 
