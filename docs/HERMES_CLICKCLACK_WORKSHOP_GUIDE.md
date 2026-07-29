@@ -64,14 +64,13 @@ ClickClack #hermes-sprint
 
 ### 3.2 Hermes Studio
 
-当前主测试实例及三套备用 Hermes Studio：
+当前主测试实例及两套备用 Hermes Studio：
 
-| 实例 | 容器 | Studio 地址 | Plugin 状态 |
+| 实例 | 容器 | Studio 地址 | 状态 |
 |---|---|---|---|
-| Hermes Main | `hermes-main` | `http://18.216.42.33:18789` | ⬜ 待安装 |
-| Hermes 1 | `ahermes-studio` | `https://ahermes.feedmob.it.com` | ⬜ 待验证 |
-| Hermes 2 | `ahermes2-studio` | `https://ahermes2.feedmob.it.com` | ⬜ 待验证 |
-| Hermes 3 | `ahermes3-studio` | `https://ahermes3.feedmob.it.com` | ⬜ 待验证 |
+| Hermes Main | `hermes-main` | `http://18.216.42.33:18789` | ✅ Plugin 与第一个 Bot 已配置 |
+| 备用 Studio 1 | `hermes-workshop-2` | `https://hermes-studio-1.feedmob.it.com` | ⚠️ HTTPS/UI 已验证；模型权限待修复 |
+| 备用 Studio 2 | `hermes-workshop-3` | `https://hermes-studio-2.feedmob.it.com` | ⚠️ HTTPS/UI 已验证；模型权限待修复 |
 
 `Hermes Main` 与 ClickClack 同在 `18.216.42.33`，使用
 `ekkoye8888/hermes-web-ui:v0.6.35`，内含 Hermes Agent `v0.19.0`。它由
@@ -80,8 +79,10 @@ Docker Compose 管理，数据位于 `/srv/hermes-main`，配置目录为
 512 PIDs。迁移备份位于
 `/var/backups/hermes-main-migration/20260729T040302Z`。
 
-另外三套备用 Studio 的源站为 `52.15.214.192`。这些实例可以用于最初的小规模验证。正式 7–8 人
-Workshop 优先让参与者使用自己的 Hermes；没有个人实例的人再使用备用 Studio。
+两套备用 Studio 与 ClickClack 同在 `18.216.42.33`，分别限制为 1.5 GiB
+内存和 0.75 CPU，使用完全独立的账户、Session、配置和持久化目录。正式 7–8
+人 Workshop 优先让参与者使用自己的 Hermes；个人实例不可用时，由主持人
+一对一分配备用 Studio。不要让两位参与者同时共用同一备用 Studio。
 
 不要假定 Studio UI 版本等于 Hermes Agent Runtime 版本。安装前必须在实际
 Runtime 中运行 `hermes version` 和 `hermes plugins list`。
