@@ -64,13 +64,15 @@ ClickClack #hermes-sprint
 
 ### 3.2 Hermes Studio
 
-当前主测试实例及两套备用 Hermes Studio：
+当前主测试实例及四套备用 Hermes Studio：
 
 | 实例 | 容器 | Studio 地址 | 状态 |
 |---|---|---|---|
 | Hermes Main | `hermes-main` | `http://18.216.42.33:18789` | ✅ Plugin 与第一个 Bot 已配置 |
 | 备用 Studio 1 | `hermes-workshop-2` | `https://hermes-studio-1.feedmob.it.com` | ⚠️ HTTPS/UI 已验证；模型权限待修复 |
 | 备用 Studio 2 | `hermes-workshop-3` | `https://hermes-studio-2.feedmob.it.com` | ⚠️ HTTPS/UI 已验证；模型权限待修复 |
+| 备用 Studio 3 | `hermes-backup-3` | `https://hermes-studio-3.feedmob.it.com` | ✅ HTTPS/UI/Socket.IO 已验证；分配前配置模型与 Plugin |
+| 备用 Studio 4 | `hermes-backup-4` | `https://hermes-studio-4.feedmob.it.com` | ✅ HTTPS/UI/Socket.IO 已验证；分配前配置模型与 Plugin |
 
 `Hermes Main` 与 ClickClack 同在 `18.216.42.33`，使用
 `ekkoye8888/hermes-web-ui:v0.6.35`，内含 Hermes Agent `v0.19.0`。它由
@@ -79,10 +81,16 @@ Docker Compose 管理，数据位于 `/srv/hermes-main`，配置目录为
 512 PIDs。迁移备份位于
 `/var/backups/hermes-main-migration/20260729T040302Z`。
 
-两套备用 Studio 与 ClickClack 同在 `18.216.42.33`，分别限制为 1.5 GiB
+备用 Studio 1/2 与 ClickClack 同在 `18.216.42.33`，分别限制为 1.5 GiB
 内存和 0.75 CPU，使用完全独立的账户、Session、配置和持久化目录。正式 7–8
 人 Workshop 优先让参与者使用自己的 Hermes；个人实例不可用时，由主持人
 一对一分配备用 Studio。不要让两位参与者同时共用同一备用 Studio。
+
+备用 Studio 3/4 位于 `52.15.214.192`，容器分别为 `hermes-backup-3` 和
+`hermes-backup-4`，本机端口分别为 `18790` 和 `18791`。Caddy 提供反向代理、
+HTTP → HTTPS 跳转和自动续期的 Let's Encrypt 证书；两个入口的 HTTPS 与
+Socket.IO 已验证。每套限制为 1.25 GiB 内存和 0.6 CPU，数据目录分别为
+`/srv/hermes-backup-3` 和 `/srv/hermes-backup-4`。
 
 不要假定 Studio UI 版本等于 Hermes Agent Runtime 版本。安装前必须在实际
 Runtime 中运行 `hermes version` 和 `hermes plugins list`。
@@ -652,7 +660,7 @@ hermes gateway restart
 - 创建主 Runbook。
 - 记录 ClickClack 域名、服务方式、Workspace 和 Channel 基础信息。
 - 记录 GitHub OAuth 已开放给任意 GitHub 用户。
-- 记录三套已知 Hermes Studio 作为测试/备用实例。
+- 记录五套已知 Hermes Studio 作为测试/备用实例。
 - 将“创建一个测试 Bot”设为下一步。
 
 ## 19. 问题记录
