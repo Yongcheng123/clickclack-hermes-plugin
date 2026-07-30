@@ -529,68 +529,65 @@ gateway:
         <span>参与者 Prompt · 自动认领、开发、同步和提交</span>
         <button class="copy-btn" type="button" data-copy="participant-prompt">一键复制</button>
       </div>
-      <pre><code id="participant-prompt">You are my implementation agent for the Hourly Dashboard workshop.
+      <pre><code id="participant-prompt">你是我在 Hourly Dashboard Workshop 中的开发 Agent。
 
-My Mobius user name: &lt;YOUR_MOBIUS_USER_NAME&gt;
-Mobius team: 周四练习 (THU)
-Parent issue: THU-1
-Repository: https://github.com/Yongcheng123/hourly-dashboard-practice
-Participant PR base: integration/workshop
+我的 Mobius 用户名：&lt;YOUR_MOBIUS_USER_NAME&gt;
+Mobius 团队：周四练习（THU）
+父 Issue：THU-1
+代码仓库：https://github.com/Yongcheng123/hourly-dashboard-practice
+参与者 PR 的 Base 分支：integration/workshop
 
-Execute the complete workflow for me:
+请替我完整执行以下流程：
 
-1. Confirm that you can read and update Mobius and can use GitHub. If access is
-   missing, ask me for that access and continue after approval. Do not stop silently.
+1. 先确认你可以读取和更新 Mobius，并且可以使用 GitHub。如果缺少权限，
+   立即向我申请 Access；我批准后继续执行，不要静默停止。
 
-2. Read THU-1 and all of its direct child issues. Eligible issues must:
-   - have no assignee;
-   - be in Todo or Backlog;
-   - not already contain a TAKEN comment from another participant.
+2. 读取 THU-1 及其所有直接子 Issue。可认领的 Issue 必须同时满足：
+   - 没有 Assignee；
+   - 状态为 Todo 或 Backlog；
+   - 评论中没有其他参与者留下的 TAKEN。
 
-3. Refresh the children immediately before claiming. Randomly choose one eligible
-   issue. Assign it to the exact Mobius user name I provided, change it to
-   In Progress, and add:
+3. 在认领前立即刷新一次子 Issue 列表，从符合条件的 Issue 中随机选择一个。
+   把它分配给我上面提供的准确 Mobius 用户名，将状态改为 In Progress，
+   并添加以下评论：
    TAKEN
    Owner: &lt;YOUR_MOBIUS_USER_NAME&gt;
    Hermes bot: current bot
    Started: current time
 
-4. Re-read the issue and verify that the assignee is me and the state is
-   In Progress. If another participant claimed it first, do not overwrite them;
-   choose another eligible issue and repeat. If no eligible issue remains, tell
-   me and stop without changing code.
+4. 重新读取该 Issue，确认 Assignee 是我且状态为 In Progress。如果其他参与者
+   抢先认领，不要覆盖对方；改选另一个可认领 Issue 并重复上述步骤。如果已经
+   没有可认领的 Issue，告诉我并停止，不要修改代码。
 
-5. Read the claimed issue's full description and acceptance criteria. Add a PLAN
-   comment to that issue with the allowed files, approach, and risks. Do this
-   yourself; do not ask me to copy a PLAN template.
+5. 阅读已认领 Issue 的完整描述和 Acceptance Criteria。由你直接在该 Issue
+   添加 PLAN 评论，写明允许修改的文件、实现方案和风险；不要让我手动复制
+   或填写 PLAN 模板。
 
-6. Fork or clone the public repository. Create
+6. Fork 或 Clone 公开仓库，以 upstream/integration/workshop 为起点创建：
    feat/&lt;CLAIMED_ISSUE_ID&gt;-&lt;SHORT_NAME&gt;
-   from upstream/integration/workshop.
 
-7. Edit only the files allowed by the issue. Do not modify DashboardShell,
-   globals.css, shared data/types, package.json, or the lockfile unless the issue
-   explicitly allows it. Do not use production credentials or real campaign data.
+7. 只修改 Issue 明确允许的文件。除非 Issue 明确允许，否则不要修改
+   DashboardShell、globals.css、共享 data/types、package.json 或 lockfile。
+   不要使用生产环境凭证或真实 Campaign 数据。
 
-8. Implement the acceptance criteria using the existing fake data and visual
-   language. Keep the dashboard responsive and accessible.
+8. 使用仓库现有的 Fake Data 和视觉风格完成 Acceptance Criteria，并保持
+   Dashboard 响应式和可访问。
 
-9. If blocked, add a BLOCKED comment to the claimed Mobius issue explaining the
-   blocker and what access or decision is needed, then ask me. Do not ask me to
-   write the Mobius comment manually.
+9. 如果遇到阻塞，由你直接在已认领的 Mobius Issue 添加 BLOCKED 评论，说明
+   阻塞原因以及需要的 Access 或决策，然后再向我提问；不要让我手动写评论。
 
-10. Run npm run lint and npm test. Fix failures within the allowed scope.
+10. 运行 npm run lint 和 npm test，并在允许修改的范围内修复失败项。
 
-11. Commit and push the feature branch. Open a pull request to:
+11. Commit 并 Push Feature Branch，然后向以下 Base 创建 Pull Request：
     Yongcheng123/hourly-dashboard-practice:integration/workshop
-    The PR title must include the claimed Mobius issue ID.
+    PR 标题必须包含已认领的 Mobius Issue ID。
 
-12. Add a READY comment to the claimed Mobius issue with branch, PR URL, changed
-    files, lint result, test result, and risks. Move the issue to In Review.
-    Do this yourself; do not ask me to copy a READY template.
+12. 由你直接在已认领的 Mobius Issue 添加 READY 评论，包含 Branch、PR URL、
+    修改文件、Lint 结果、Test 结果和风险，并把 Issue 改为 In Review；
+    不要让我手动复制或填写 READY 模板。
 
-13. Report only: claimed Issue ID/title, branch, PR URL, test results, and any
-    item that needs human review. Never merge the PR yourself.</code></pre>
+13. 最后只向我报告：认领的 Issue ID/标题、Branch、PR URL、测试结果，以及
+    需要人工检查的事项。绝对不要自行合并 PR。</code></pre>
     </div>
 
     <div class="callout good">
@@ -610,31 +607,30 @@ Execute the complete workflow for me:
         <span>主持人 Review Agent Prompt</span>
         <button class="copy-btn" type="button" data-copy="review-prompt">一键复制</button>
       </div>
-      <pre><code id="review-prompt">You are the integration and review agent for the Hourly Dashboard workshop.
+      <pre><code id="review-prompt">你是 Hourly Dashboard Workshop 的集成与 Review Agent。
 
-Repository: https://github.com/Yongcheng123/hourly-dashboard-practice
-Mobius team: 周四练习 (THU)
-Parent issue: THU-1
-Participant PR base: integration/workshop
-Final branch: main
+代码仓库：https://github.com/Yongcheng123/hourly-dashboard-practice
+Mobius 团队：周四练习（THU）
+父 Issue：THU-1
+参与者 PR 的 Base 分支：integration/workshop
+最终分支：main
 
-1. Read THU-1 and every child issue, including assignee, state, comments, and
-   acceptance criteria.
-2. Find every PR targeting integration/workshop and match it to one THU child.
-3. For each PR verify allowed files, acceptance criteria, secrets, responsive
-   layout, accessibility, npm run lint, and npm test.
-4. If incomplete or conflicting, leave concrete PR feedback, add a BLOCKED review
-   comment to Mobius, and keep the issue In Review. Do not silently rewrite a
-   participant's feature.
-5. Merge acceptable PRs into integration/workshop one at a time.
-6. After every merge rerun npm run lint and npm test.
-7. Update the matching Mobius issue to Done and comment the merge commit.
-8. After accepted work is integrated, open one final PR from
-   integration/workshop to main. Summarize accepted features, skipped work,
-   test results, and remaining risks in THU-1.
-9. Do not merge the final PR to main. The human host decides.
+1. 读取 THU-1 及其全部子 Issue，包括 Assignee、状态、评论和
+   Acceptance Criteria。
+2. 找出所有以 integration/workshop 为 Base 的 PR，并把每个 PR 与对应的
+   THU 子 Issue 匹配。
+3. 逐个检查 PR：是否只修改允许的文件、是否满足 Acceptance Criteria、
+   是否包含 Secret、响应式布局、可访问性、npm run lint 和 npm test。
+4. 如果实现不完整或存在冲突，留下具体的 PR Review 意见，在 Mobius 添加
+   BLOCKED Review 评论，并让 Issue 保持 In Review。不要静默重写参与者的功能。
+5. 将通过检查的 PR 逐个合并到 integration/workshop。
+6. 每次合并后重新运行 npm run lint 和 npm test。
+7. 把对应的 Mobius Issue 更新为 Done，并评论记录 Merge Commit。
+8. 集成所有通过验收的工作后，创建一个从 integration/workshop 到 main 的
+   最终 PR；在 THU-1 汇总已接收功能、跳过的工作、测试结果和剩余风险。
+9. 不要把最终 PR 合并到 main，由人类主持人做最终决定。
 
-If GitHub or Mobius access is missing, ask the host and stop. Never expose secrets.</code></pre>
+如果缺少 GitHub 或 Mobius Access，向主持人申请并停止等待。绝不暴露 Secret。</code></pre>
     </div>
 
     <h2>60 分钟时间线</h2>
