@@ -462,9 +462,15 @@ Mobius PAT:
 不要在回复、终端输出、config.yaml 或 Git 中复述 Token。
 
 直接完成配置，不要重新调查 Hermes 安装路径或源码。
-所有配置完成后再重启 Gateway。
+所有配置完成后，使用 Plugin 自带的安全重启脚本：
 
-如果第一次启动因配置错误失败，修复后允许再启动一次，不需要询问。
+python3 "${HERMES_HOME:-$HOME/.hermes}/plugins/clickclack-hermes/scripts/restart_gateway_safely.py" \
+  --hermes-home "${HERMES_HOME:-$HOME/.hermes}"
+
+不要直接在 Terminal 前台运行 hermes gateway restart，不要使用 timeout，
+不要用持续的 logs --follow 等待连接。脚本返回后再继续验证。
+
+如果脚本报告明确的配置错误，修复后允许再运行一次，不需要询问。
 
 最后只告诉我：
 - Plugin Doctor 是否 PASS
@@ -494,6 +500,7 @@ Mobius PAT:
         <tr><td>没有 plugins 或 gateway</td><td>联系主持人使用备用 Studio。</td></tr>
         <tr><td>Mobius <code>401/403</code></td><td>在 Mobius 开发者页重新生成 PAT，并替换 <code>HERMES_HOME/.env</code> 中的 <code>MOBIUS_PAT</code>。</td></tr>
         <tr><td>Mobius 工具未出现</td><td>检查 <code>mcp_servers.mobius</code>、环境变量引用和 Gateway 启动日志；不要添加第二个同名条目。</td></tr>
+        <tr><td>Gateway 约 90 秒后下线</td><td>说明它被前台 Terminal 超时终止；更新 Plugin 后使用 <code>restart_gateway_safely.py</code>，不要用 <code>timeout</code> 或前台 Gateway。</td></tr>
         <tr><td>Refresh 后仍未加载</td><td>创建新 Session，必要时重启当前 Gateway。</td></tr>
         <tr><td>Bot 在线但不回复</td><td>检查 @handle、Channel 和 Doctor 结果。</td></tr>
         <tr><td>ClickClack <code>401/403</code></td><td>生成新 Bot Token 后替换。</td></tr>
@@ -682,6 +689,9 @@ Mobius 团队：周四练习（THU）
 
   <div class="footer">
     <strong>版本记录</strong><br>
+    2026-07-30：Plugin 新增安全 Gateway 重启脚本；Gateway 脱离 Agent Terminal
+    的超时进程组运行，通过独立日志和有界健康检查避免 90 秒后被 SIGTERM
+    关闭。<br>
     2026-07-30：阶段一改为两个目标型短 Prompt；安装细节由 AI-friendly README
     负责，参与者只提供必要值和授权，减少重复检查与源码调查。<br>
     2026-07-29：根据首次完整安装回放精简 Prompt 2；补齐
