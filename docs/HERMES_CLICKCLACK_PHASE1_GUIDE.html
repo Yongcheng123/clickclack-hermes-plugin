@@ -3,141 +3,187 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>第一阶段：把自己的 Hermes 连接到 ClickClack</title>
-  <meta name="description" content="面向同事的 Hermes Studio × ClickClack Plugin 安装、Bot 创建、配置与 PONG 验证指南。">
+  <title>Hermes × ClickClack Workshop 全流程指南</title>
+  <meta name="description" content="从 Hermes 接入 ClickClack，到自动认领 Mobius Issue、开发 Hourly Dashboard 和提交 PR 的完整 Workshop 指南。">
   <style>
     :root {
-      --ink: #172033;
-      --muted: #5f6b7b;
-      --line: #dbe3ec;
-      --panel: #f7f9fc;
-      --brand: #087ea4;
-      --brand-soft: #e9f8fd;
-      --good: #067647;
+      --ink: #17211e;
+      --muted: #64716c;
+      --line: #dce5de;
+      --panel: #f5f8f4;
+      --card: #ffffff;
+      --green: #134e45;
+      --green-2: #0b7562;
+      --mint: #b9f4d4;
+      --mint-soft: #e9f9ef;
       --warn: #a15c00;
-      --code: #0f172a;
+      --warn-soft: #fff6df;
+      --code: #10241f;
+      --blue: #0b78b7;
     }
     * { box-sizing: border-box; }
     html { scroll-behavior: smooth; }
     body {
       margin: 0;
-      padding: 42px 26px 80px;
-      background: #fff;
+      background:
+        radial-gradient(circle at 8% 0%, rgba(185, 244, 212, .55), transparent 30rem),
+        #f4f7f3;
       color: var(--ink);
       font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI",
         "PingFang SC", "Microsoft YaHei", sans-serif;
       line-height: 1.68;
     }
-    main { width: min(980px, 100%); margin: 0 auto; }
-    h1 { margin: 0; font-size: clamp(2.1rem, 5vw, 3.5rem); line-height: 1.08; }
+    main { width: min(1040px, calc(100% - 32px)); margin: 0 auto; padding: 58px 0 80px; }
+    h1 { max-width: 850px; margin: 0; font-size: clamp(2.35rem, 6vw, 4.25rem); line-height: 1.04; letter-spacing: -.055em; }
     h2 {
-      margin: 3.2rem 0 1rem;
+      margin: 3rem 0 1rem;
       padding-top: 1rem;
       border-top: 1px solid var(--line);
-      font-size: 1.8rem;
+      font-size: clamp(1.65rem, 4vw, 2.1rem);
+      letter-spacing: -.035em;
     }
     h3 { margin: 1.8rem 0 .75rem; font-size: 1.2rem; }
     p { margin: .7rem 0; }
-    a { color: var(--brand); }
+    a { color: var(--blue); }
     code {
       padding: .12rem .34rem;
       border-radius: 5px;
-      background: #eef2f6;
+      background: #eaf0eb;
       font-size: .92em;
       overflow-wrap: anywhere;
     }
     .eyebrow {
       margin-bottom: .8rem;
-      color: var(--brand);
-      font-size: .82rem;
-      font-weight: 800;
-      letter-spacing: .12em;
+      color: var(--green-2);
+      font-size: .8rem;
+      font-weight: 850;
+      letter-spacing: .14em;
       text-transform: uppercase;
     }
-    .lead { max-width: 760px; color: var(--muted); font-size: 1.12rem; }
+    .lead { max-width: 790px; color: var(--muted); font-size: 1.12rem; }
     .meta {
       display: flex;
       flex-wrap: wrap;
       gap: .55rem;
-      margin: 1.25rem 0 0;
+      margin: 1.25rem 0 1.8rem;
     }
     .pill {
-      padding: .35rem .65rem;
+      padding: .35rem .68rem;
       border: 1px solid var(--line);
       border-radius: 999px;
-      background: var(--panel);
-      color: #3b4656;
-      font-size: .86rem;
+      background: rgba(255,255,255,.75);
+      color: #3b4a44;
+      font-size: .84rem;
     }
+    .tabs {
+      position: sticky;
+      top: 12px;
+      z-index: 10;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin: 0 0 26px;
+      padding: 7px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: rgba(255,255,255,.9);
+      box-shadow: 0 12px 34px rgba(18, 65, 54, .09);
+      backdrop-filter: blur(16px);
+    }
+    .tab-button {
+      border: 0;
+      border-radius: 11px;
+      padding: 13px 16px;
+      background: transparent;
+      color: #53625d;
+      font: inherit;
+      font-weight: 800;
+      cursor: pointer;
+    }
+    .tab-button[aria-selected="true"] {
+      background: var(--green);
+      color: white;
+    }
+    .tab-panel { display: none; }
+    .tab-panel.is-active { display: block; }
+    .panel-intro {
+      padding: 24px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: rgba(255,255,255,.88);
+      box-shadow: 0 18px 50px rgba(18, 65, 54, .05);
+    }
+    .panel-intro h2 { margin: 0 0 8px; padding: 0; border: 0; }
     .steps {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       gap: .7rem;
-      margin: 2rem 0;
+      margin: 1.5rem 0;
     }
     .step-card {
-      min-height: 112px;
-      padding: .9rem;
+      min-height: 108px;
+      padding: .95rem;
       border: 1px solid var(--line);
       border-radius: 12px;
-      background: var(--panel);
+      background: var(--card);
     }
-    .step-card b { display: block; margin-bottom: .35rem; color: var(--brand); }
+    .step-card b { display: block; margin-bottom: .35rem; color: var(--green-2); }
     .callout {
       margin: 1rem 0;
       padding: 1rem 1.1rem;
-      border-left: 4px solid #38bdf8;
-      border-radius: 8px;
-      background: var(--brand-soft);
+      border-left: 4px solid #34b98a;
+      border-radius: 9px;
+      background: var(--mint-soft);
     }
-    .callout.warn { border-left-color: #f59e0b; background: #fff8e8; }
-    .callout.good { border-left-color: #22c55e; background: #edfdf3; }
+    .callout.warn { border-left-color: #f0a20b; background: var(--warn-soft); }
+    .callout.good { border-left-color: #22a761; background: #edf9f1; }
     .copy-card {
       margin: 1rem 0;
       overflow: hidden;
-      border: 1px solid #263449;
-      border-radius: 12px;
+      border: 1px solid #284039;
+      border-radius: 14px;
       background: var(--code);
-      box-shadow: 0 12px 28px rgba(15, 23, 42, .12);
+      box-shadow: 0 12px 28px rgba(15, 45, 36, .13);
     }
     .copy-bar {
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 1rem;
-      padding: .65rem .8rem;
-      border-bottom: 1px solid #263449;
-      color: #a8b4c6;
+      padding: .7rem .85rem;
+      border-bottom: 1px solid #2a453d;
+      color: #afcbc2;
       font-size: .86rem;
     }
     .copy-btn, .primary-link {
       appearance: none;
       border: 0;
       border-radius: 8px;
-      padding: .48rem .75rem;
-      background: #0ea5e9;
+      padding: .48rem .78rem;
+      background: var(--green-2);
       color: #fff;
       font: inherit;
-      font-weight: 750;
+      font-weight: 780;
       text-decoration: none;
       cursor: pointer;
     }
-    .copy-btn:hover, .primary-link:hover { background: #0284c7; }
+    .copy-btn:hover, .primary-link:hover { background: var(--green); }
     pre {
       margin: 0;
       padding: 1rem 1.1rem 1.2rem;
       overflow-x: auto;
-      color: #e6edf7;
+      color: #eafff6;
       white-space: pre-wrap;
       word-break: break-word;
     }
-    pre code { padding: 0; background: transparent; color: inherit; font-size: .9rem; }
+    pre code { padding: 0; background: transparent; color: inherit; font-size: .88rem; }
     table {
       display: block;
       width: max-content;
       max-width: 100%;
       overflow-x: auto;
       border-collapse: collapse;
+      background: white;
     }
     th, td {
       padding: .68rem .8rem;
@@ -145,7 +191,7 @@
       text-align: left;
       vertical-align: top;
     }
-    th { background: #f2f6fa; }
+    th { background: #eef4ef; }
     .shot {
       margin: 1.1rem 0;
       overflow: hidden;
@@ -156,13 +202,27 @@
     .shot img { display: block; width: 100%; height: auto; }
     .shot figcaption {
       padding: .7rem .9rem;
-      background: #f8fafc;
+      background: #f8faf8;
       color: var(--muted);
       font-size: .88rem;
     }
     .gallery { display: grid; grid-template-columns: 1fr; gap: 1rem; }
     .checklist { padding-left: 1.25rem; }
     .checklist li { margin: .45rem 0; }
+    .issue-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: .65rem;
+      margin: 1rem 0;
+    }
+    .issue {
+      padding: .8rem .9rem;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: white;
+    }
+    .issue b { color: var(--green-2); }
+    .issue.reserved { border-color: #efb344; background: #fff8e9; }
     .footer {
       margin-top: 3.5rem;
       padding-top: 1.3rem;
@@ -171,215 +231,190 @@
       font-size: .9rem;
     }
     @media (max-width: 760px) {
-      body { padding: 28px 18px 60px; }
+      main { padding-top: 34px; }
       .steps { grid-template-columns: 1fr 1fr; }
+      .issue-grid { grid-template-columns: 1fr; }
     }
     @media (max-width: 460px) {
       .steps { grid-template-columns: 1fr; }
       .copy-bar { align-items: flex-start; flex-direction: column; }
+      .tabs { top: 6px; }
     }
   </style>
 </head>
 <body>
 <main>
-  <div class="eyebrow">Hermes × ClickClack Workshop · Phase 1</div>
-  <h1>第一阶段：把自己的 Hermes 连接到 ClickClack</h1>
+  <div class="eyebrow">Hermes × ClickClack Workshop</div>
+  <h1>从连接 Bot，到多人协作完成一个项目</h1>
   <p class="lead">
-    这份页面给 Workshop 参与者直接照着操作。每段需要输入 Hermes 的内容都带
-    “一键复制”；真实 Bot Token 不会出现在本文档中。
+    阶段一把每个人自己的 Hermes 接入同一个 ClickClack Channel；阶段二让各自的
+    Bot 自动认领 Mobius Issue、完成独立模块、提交 PR，并由主持人的 Review Agent 集成。
   </p>
   <div class="meta">
-    <span class="pill">预计 10–20 分钟</span>
-    <span class="pill">每人一只 User-owned Bot</span>
-    <span class="pill">Hermes Agent v0.19+</span>
+    <span class="pill">总时长：约 60 分钟</span>
+    <span class="pill">7–8 位参与者</span>
+    <span class="pill">公开 Repo + 假数据</span>
     <span class="pill">最后更新：2026-07-29</span>
   </div>
 
-  <div class="steps" aria-label="流程概览">
-    <div class="step-card"><b>01</b>登录自己的 Hermes Studio，安装 Plugin</div>
-    <div class="step-card"><b>02</b>在 ClickClack 创建个人 Bot</div>
-    <div class="step-card"><b>03</b>把 Workspace、Channel 和 Token 配给 Hermes</div>
-    <div class="step-card"><b>04</b>在 Channel 里完成 PONG 测试</div>
-  </div>
+  <nav class="tabs" role="tablist" aria-label="Workshop 阶段">
+    <button class="tab-button" id="tab-phase-1" type="button" role="tab"
+      aria-selected="true" aria-controls="phase-1" data-tab="phase-1">阶段一 · 连接 Hermes</button>
+    <button class="tab-button" id="tab-phase-2" type="button" role="tab"
+      aria-selected="false" aria-controls="phase-2" data-tab="phase-2">阶段二 · 完成 Issue</button>
+  </nav>
 
-  <div class="callout">
-    <strong>开始前需要：</strong>自己的 Hermes Studio Web UI、可登录的 GitHub
-    账号，以及访问
-    <a href="https://clickclack-ken-team.feedmob.it.com/app" target="_blank" rel="noreferrer">Hermes Workshop ClickClack</a>
-    的权限。
-  </div>
-
-  <div class="callout warn">
-    <strong>备用 Hermes Studio：</strong>优先使用自己的 Hermes。只有自己的
-    Studio 无法登录、无法启动或无法安装 Plugin 时，才联系主持人分配下面一个
-    备用实例。同一时间一个备用实例只给一位参与者使用，不要共用账户、Session
-    或 Bot Token。
-    <p>
-      <a class="primary-link" href="https://hermes-studio-1.feedmob.it.com/" target="_blank" rel="noreferrer">打开备用 Hermes Studio 1</a>
-      &nbsp;
-      <a class="primary-link" href="https://hermes-studio-2.feedmob.it.com/" target="_blank" rel="noreferrer">打开备用 Hermes Studio 2</a>
-      &nbsp;
-      <a class="primary-link" href="https://hermes-studio-3.feedmob.it.com/" target="_blank" rel="noreferrer">打开备用 Hermes Studio 3</a>
-      &nbsp;
-      <a class="primary-link" href="https://hermes-studio-4.feedmob.it.com/" target="_blank" rel="noreferrer">打开备用 Hermes Studio 4</a>
-    </p>
-    <strong>当前状态：</strong>四个入口的 HTTPS 和 Web UI 已上线；正式分配前，
-    由主持人先确认 <code>minimax-m3</code> 推理测试已经通过。
-  </div>
-
-  <h2 id="step-1">步骤 1：在自己的 Hermes Studio 安装 Plugin</h2>
-  <ol class="checklist">
-    <li>登录你自己的 Hermes Studio Web UI。</li>
-    <li>开启一个新的 Hermes 会话。</li>
-    <li>复制下面的安装 Prompt，粘贴到 Hermes 对话中并发送。</li>
-  </ol>
-
-  <div class="copy-card">
-    <div class="copy-bar">
-      <span>Prompt 1 · 安装并检查 Plugin</span>
-      <button class="copy-btn" type="button" data-copy="install-prompt">一键复制</button>
+  <section class="tab-panel is-active" id="phase-1" role="tabpanel" aria-labelledby="tab-phase-1">
+    <div class="panel-intro">
+      <h2>阶段一：把自己的 Hermes 连接到 ClickClack</h2>
+      <p>参与者只需要复制真正的 Prompt。Bot 表单是网页填写参考，不会提供复制按钮。</p>
     </div>
-    <pre><code id="install-prompt">请在当前 Hermes Studio 实例中安装并检查这个 Hermes Platform Plugin：
+
+    <div class="steps" aria-label="阶段一流程">
+      <div class="step-card"><b>01</b>让 Hermes 安装 Plugin，并及时允许 Access</div>
+      <div class="step-card"><b>02</b>安装期间，在 ClickClack 创建个人 Bot</div>
+      <div class="step-card"><b>03</b>把 Token 交给 Hermes，一次配置并启用</div>
+      <div class="step-card"><b>04</b>在 Channel 里完成 PONG 测试</div>
+    </div>
+
+    <div class="callout">
+      <strong>开始前需要：</strong>自己的 Hermes Studio Web UI、可登录的 GitHub
+      账号，以及访问
+      <a href="https://clickclack-ken-team.feedmob.it.com/app" target="_blank" rel="noreferrer">Hermes Workshop ClickClack</a>
+      的权限。
+    </div>
+
+    <div class="callout">
+      <strong>关于 Hermes 版本：</strong>参与者不需要记版本号，也不需要自己运行
+      版本检查。能正常对话是第一步；安装还需要当前 Hermes 支持
+      <code>plugins</code> 和 <code>gateway</code>。下面的 Prompt 会自动检查，
+      如果缺少这些能力，直接联系主持人换用备用 Studio。
+    </div>
+
+    <div class="callout warn">
+      <strong>Access 很重要：</strong>Hermes 安装时可能请求 Terminal、文件、Git
+      或网络 Access。看到请求后要立即允许当前会话，否则 Hermes 会停下来等待。
+      只授权当前 Hermes 完成本次操作。
+    </div>
+
+    <div class="callout warn">
+      <strong>备用 Hermes Studio：</strong>优先使用自己的 Hermes。自己的 Studio
+      无法登录、无法启动或无法安装 Plugin 时，再联系主持人分配一个备用实例。
+      同一时间一个实例只给一位参与者使用。
+      <p>
+        <a class="primary-link" href="https://hermes-studio-1.feedmob.it.com/" target="_blank" rel="noreferrer">备用 Studio 1</a>
+        <a class="primary-link" href="https://hermes-studio-2.feedmob.it.com/" target="_blank" rel="noreferrer">备用 Studio 2</a>
+        <a class="primary-link" href="https://hermes-studio-3.feedmob.it.com/" target="_blank" rel="noreferrer">备用 Studio 3</a>
+        <a class="primary-link" href="https://hermes-studio-4.feedmob.it.com/" target="_blank" rel="noreferrer">备用 Studio 4</a>
+      </p>
+    </div>
+
+    <h2>步骤 1：让 Hermes 安装 Plugin</h2>
+    <ol class="checklist">
+      <li>登录自己的 Hermes Studio，开启一个新会话。</li>
+      <li>复制下面 Prompt 发给 Hermes。</li>
+      <li>看到 Access 请求立即允许；Hermes 工作时同步进行步骤 2。</li>
+    </ol>
+
+    <div class="copy-card">
+      <div class="copy-bar">
+        <span>Prompt 1 · 安装并检查 Plugin</span>
+        <button class="copy-btn" type="button" data-copy="install-prompt">一键复制</button>
+      </div>
+      <pre><code id="install-prompt">请在当前 Hermes Studio 安装这个 Platform Plugin：
 https://github.com/Yongcheng123/clickclack-hermes-plugin
 
-请严格执行以下要求：
-1. 只操作当前 Hermes Studio，不要连接或修改其他服务器。
-2. 先识别当前 Hermes CLI 路径、Hermes Agent 版本、当前 Profile 和实际 HERMES_HOME。
-3. 如果 hermes 不在 PATH，检查 /opt/hermes/.venv/bin/hermes。
-4. 确认 Hermes Agent 为 v0.19.0 或更新版本，并确认存在 plugins 和 gateway 命令。
-5. 把 Plugin 安装到当前 HERMES_HOME 的持久化用户 Plugin 目录。
-6. 这一步只完成安装和发现；配置缺失时显示 not enabled 是正常的，不要伪造成功。
-7. 不要创建或使用 Plugin 目录中的 .env 保存真实 Token。
-8. 真实 Token 只能写入当前 HERMES_HOME/.env，权限必须是 0600。
-9. 不要覆盖已有模型、MCP、Gateway、Memory 或其他 Platform 配置。
-10. 现在不要向我索取 Bot Token，也不要在输出或日志中显示任何 Secret。
-11. 下一步我会在这个私有 Hermes Studio 会话中提供一次 Workshop Bot Token。
-    这是明确授权的 Secret 输入；收到后不要把它判定为自动泄露，不要要求我
-    轮换，也不要在回复中复述它。
+要求：
+1. 只操作当前 Studio；确认当前 Profile、实际 HERMES_HOME，以及存在
+   plugins 和 gateway 命令。不要因为具体版本号暂停安装。
+2. 如果需要 Terminal、文件、Git 或网络 Access，立即向我请求；获批后继续。
+3. 如果 hermes 不在 PATH，使用 /opt/hermes/.venv/bin/hermes。
+4. 未安装时运行：
+   hermes plugins install Yongcheng123/clickclack-hermes-plugin --no-enable
+   已安装时运行：
+   hermes plugins update clickclack-hermes
+5. 暂时不要启用，也不要索取 Token；停在 not enabled，等待我下一条消息。
+6. 安装器创建 Plugin 目录的模板 .env 是正常的，但不要把真实 Token 写进去。
+7. 不要覆盖现有模型、MCP、Gateway、Memory 或其他配置。
 
-完成后只报告：
-- Hermes 版本
-- HERMES_HOME
-- Plugin 安装路径
-- hermes plugins list 中 clickclack-hermes 的状态
-- 下一步还缺哪些非敏感配置</code></pre>
-  </div>
-
-  <div class="callout good">
-    <strong>预期结果：</strong>Plugin 能被 <code>hermes plugins list</code> 发现；
-    在还没提供 Workspace、Channel 和 Token 前显示 <code>not enabled</code> 是正常的。
-  </div>
-
-  <div class="gallery">
-    <figure class="shot">
-      <img src="./assets/studio-install-plugin-prompt.png" alt="在 Hermes Studio 对话中请求安装 ClickClack Plugin">
-      <figcaption>Hermes 会先检查 Repo、CLI、Plugin 目录和运行环境。</figcaption>
-    </figure>
-    <figure class="shot">
-      <img src="./assets/studio-plugin-requirements.png" alt="Hermes 检查版本并列出缺少的配置">
-      <figcaption>Hermes 找到 CLI 后，会确认版本并列出 Base URL、Workspace、Channel、Token 等待办项。</figcaption>
-    </figure>
-    <figure class="shot">
-      <img src="./assets/studio-plugin-installed.png" alt="Plugin 已安装但尚未启用">
-      <figcaption>Plugin 已安装但配置未完成时，<code>not enabled</code> 是预期状态。</figcaption>
-    </figure>
-  </div>
-
-  <h2 id="step-2">步骤 2：在 ClickClack 创建自己的 Bot</h2>
-  <p>
-    进入 ClickClack 的 <strong>Workspace settings → Automation → Bots &amp; agents</strong>，
-    点击右上角 <strong>Add bot</strong>。
-  </p>
-  <p>
-    <a class="primary-link" href="https://clickclack-ken-team.feedmob.it.com/app/wsp_01kynt5edyr9t13dd5nxf3c0gx/settings/bots" target="_blank" rel="noreferrer">
-      打开 Bots &amp; agents
-    </a>
-  </p>
-
-  <table>
-    <thead>
-      <tr><th>字段</th><th>怎么填</th><th>说明</th></tr>
-    </thead>
-    <tbody>
-      <tr><td>Display name</td><td><code>你的名字 Hermes</code></td><td>示例：<code>Ken Hermes</code></td></tr>
-      <tr><td>Handle</td><td><code>你的名字-hermes</code></td><td>必须唯一，使用小写英文和连字符</td></tr>
-      <tr><td>Ownership</td><td><code>User-owned bot</code></td><td>每位参与者都选这个</td></tr>
-      <tr><td>How will you connect it?</td><td><code>Manual token</code></td><td>不要选 OpenClaw Setup code</td></tr>
-      <tr><td>Scope</td><td><code>Read &amp; write</code></td><td>对应 <code>bot:write</code>，不要选 Admin</td></tr>
-      <tr><td>Token name</td><td><code>hermes-workshop</code></td><td>方便之后识别和撤销</td></tr>
-    </tbody>
-  </table>
-
-  <figure class="shot">
-    <img src="./assets/clickclack-create-user-owned-bot.png" alt="ClickClack 创建 User-owned Bot 表单">
-    <figcaption>正确选择：User-owned bot、Manual token、Read &amp; write。</figcaption>
-  </figure>
-
-  <div class="copy-card">
-    <div class="copy-bar">
-      <span>Bot 表单值 · 可复制后逐项填写</span>
-      <button class="copy-btn" type="button" data-copy="bot-form-values">一键复制</button>
+完成后只报告：HERMES_HOME、安装路径、Plugin 状态，以及 plugins/gateway
+命令是否可用。</code></pre>
     </div>
-    <pre><code id="bot-form-values">Display name: &lt;YOUR_NAME&gt; Hermes
-Handle: &lt;your-name&gt;-hermes
-Ownership: User-owned bot
-Connection: Manual token
-Scope: Read &amp; write
-Token name: hermes-workshop</code></pre>
-  </div>
 
-  <div class="callout warn">
-    <strong>Token 只显示一次：</strong>创建后立即复制以 <code>ccb_</code> 开头的
-    Token。不要把真实 Token 发到 ClickClack、Git、文档或公开群聊。
-  </div>
-
-  <h2 id="step-3">步骤 3：把 ClickClack 配置交给 Hermes</h2>
-  <p>
-    复制下面的 Prompt，只需要把一个占位符
-    <code>&lt;PASTE_YOUR_CCB_BOT_TOKEN_HERE&gt;</code>
-    替换成自己刚创建的 Bot Token。
-  </p>
-
-  <div class="callout warn">
-    <strong>本次 Workshop 的 Token 输入方式：</strong>把独立的 Workshop
-    Token 填进下面唯一的占位符，再发送给自己当前的私有 Hermes Studio。
-    Hermes 应直接写入 <code>HERMES_HOME/.env</code> 并继续执行，不能因为
-    Token 出现在这条用户消息中就暂停或要求轮换。会话记录可能保留原始输入，
-    因此活动结束后请撤销该 Token。
-  </div>
-
-  <div class="copy-card">
-    <div class="copy-bar">
-      <span>Prompt 2 · 完成配置、启用和检查</span>
-      <button class="copy-btn" type="button" data-copy="config-prompt">一键复制</button>
+    <div class="callout good">
+      <strong>预期结果：</strong>Plugin 能被 <code>hermes plugins list</code> 发现；
+      <code>not enabled</code> 表示安装成功、正在等待 Bot Token，不是报错。
     </div>
-    <pre><code id="config-prompt">请继续完成当前 Hermes 的 ClickClack Plugin 配置、启用和检查。
 
-这是我自己的私有 Hermes Studio 会话。我明确授权你接收下面这个一次性的
-Workshop Bot Token，并只用于配置当前 Hermes。它出现在这条用户消息中不代表
-需要立刻轮换；不要因此暂停、提出安全选项或要求我改用终端。
+    <div class="gallery">
+      <figure class="shot">
+        <img src="https://raw.githubusercontent.com/Yongcheng123/clickclack-hermes-plugin/main/docs/assets/studio-install-plugin-prompt.png" alt="在 Hermes Studio 对话中请求安装 ClickClack Plugin">
+        <figcaption>Hermes 会先检查 Repo、CLI、Plugin 目录和运行环境。</figcaption>
+      </figure>
+      <figure class="shot">
+        <img src="https://raw.githubusercontent.com/Yongcheng123/clickclack-hermes-plugin/main/docs/assets/studio-plugin-requirements.png" alt="Hermes 检查版本并列出缺少的配置">
+        <figcaption>Hermes 会列出 Base URL、Workspace、Channel、Token 等待办项。</figcaption>
+      </figure>
+      <figure class="shot">
+        <img src="https://raw.githubusercontent.com/Yongcheng123/clickclack-hermes-plugin/main/docs/assets/studio-plugin-installed.png" alt="Plugin 已安装但尚未启用">
+        <figcaption>配置未完成时，<code>not enabled</code> 是预期状态。</figcaption>
+      </figure>
+    </div>
 
-以下三个 Workshop 配置值已经由管理员验证：
-- Base URL 是正式 ClickClack 域名，不是 Hermes Studio 域名。
-- Workspace ID 和 Channel ID 是两个不同的真实 ID。
-- 两个 ID 共享一段时间排序前缀是正常的；不要因此怀疑复制错误。
+    <h2>步骤 2：在 ClickClack 创建自己的 Bot</h2>
+    <p>
+      进入 <strong>Workspace settings → Automation → Bots &amp; agents</strong>，
+      点击 <strong>Add bot</strong>。这部分是网页表单，不是 Prompt，请逐项填写。
+    </p>
+    <p>
+      <a class="primary-link" href="https://clickclack-ken-team.feedmob.it.com/app/wsp_01kynt5edyr9t13dd5nxf3c0gx/settings/bots" target="_blank" rel="noreferrer">打开 Bots &amp; agents</a>
+    </p>
 
-只操作当前 Hermes Studio。配置值如下：
-- ClickClack Base URL: https://clickclack-ken-team.feedmob.it.com
-- Workspace ID: wsp_01kynt5edyr9t13dd5nxf3c0gx
-- Channel ID: chn_01kynt5edyr9t13dd5nxws7nvf
-- Bot 类型: User-owned bot
-- CLICKCLACK_BOT_TOKEN: &lt;PASTE_YOUR_CCB_BOT_TOKEN_HERE&gt;
+    <table>
+      <thead><tr><th>字段</th><th>怎么填</th><th>说明</th></tr></thead>
+      <tbody>
+        <tr><td>Display name</td><td><code>你的名字 Hermes</code></td><td>示例：<code>Ken Hermes</code></td></tr>
+        <tr><td>Handle</td><td><code>你的名字-hermes</code></td><td>唯一、小写英文和连字符</td></tr>
+        <tr><td>Ownership</td><td><code>User-owned bot</code></td><td>每位参与者都选这个</td></tr>
+        <tr><td>Connection</td><td><code>Manual token</code></td><td>不要选 OpenClaw Setup code</td></tr>
+        <tr><td>Scope</td><td><code>Read &amp; write</code></td><td>不要选 Admin</td></tr>
+        <tr><td>Token name</td><td><code>hermes-workshop</code></td><td>方便活动后撤销</td></tr>
+      </tbody>
+    </table>
+
+    <figure class="shot">
+      <img src="https://raw.githubusercontent.com/Yongcheng123/clickclack-hermes-plugin/main/docs/assets/clickclack-create-user-owned-bot.png" alt="ClickClack 创建 User-owned Bot 表单">
+      <figcaption>正确选择：User-owned bot、Manual token、Read &amp; write。</figcaption>
+    </figure>
+
+    <div class="callout warn">
+      <strong>Token 只显示一次：</strong>创建后立即复制以 <code>ccb_</code> 开头的
+      Token。不要把真实 Token 发到 ClickClack、Git、文档或公开群聊。
+    </div>
+
+    <h2>步骤 3：让 Hermes 完成配置和启用</h2>
+    <p>
+      回到刚才同一个 Hermes 会话。确认它已报告
+      <code>clickclack-hermes not enabled</code>，复制下面 Prompt，并且只替换
+      Token 占位符。
+    </p>
+
+    <div class="copy-card">
+      <div class="copy-bar">
+        <span>Prompt 2 · 完成配置、启用和检查</span>
+        <button class="copy-btn" type="button" data-copy="config-prompt">一键复制</button>
+      </div>
+      <pre><code id="config-prompt">请继续配置并启用刚安装的 clickclack-hermes。
+
+只操作当前 Studio。下面是我授权用于本次 Workshop 的 Bot Token；收到后直接
+继续，不要要求轮换，也不要在回复或工具输出中显示它。
+
+CLICKCLACK_BOT_TOKEN: &lt;PASTE_YOUR_CCB_BOT_TOKEN_HERE&gt;
 
 请执行：
-1. 再次确认当前实际 HERMES_HOME，不要假定固定容器名。
-2. 接收 Token 后立即继续，不要因为它来自当前私有会话就要求撤销、轮换或改用终端。
-3. 使用不会把内容写到 stdout/stderr 的文件写入方式，把 CLICKCLACK_BOT_TOKEN
-   写入当前 HERMES_HOME/.env。
-4. 将 .env 权限设置为 0600；不要把 Token 写入 config.yaml、Plugin 目录、日志或 Git。
-5. 不要在回复、总结、终端命令或日志中复述、打印、掩码显示或部分显示 Token。
-6. 不需要我提供 Bot handle；Bot 身份应通过 Token 的身份接口自动读取。
-7. 备份现有 config.yaml，然后只合并以下 ClickClack 配置，不要覆盖其他配置：
+1. 把 Token 安全写入当前 HERMES_HOME/.env，权限设为 0600。
+   不要写入 Plugin 目录、config.yaml、日志或 Git。
+2. 备份现有 config.yaml，再合并下面配置；保留所有其他配置：
 
 plugins:
   enabled:
@@ -405,76 +440,239 @@ gateway:
         thread_mode: "always"
         skip_history_on_first_start: true
 
-8. 启用 clickclack-hermes。
-9. 运行 Plugin 自带 doctor；Doctor 只能读取身份、Workspace 和 Channel，不能发送消息。
-10. 如果需要生效，重启当前 Hermes Gateway；不要重启其他服务器或容器。
-11. 最后确认：
-   - hermes plugins list 显示 clickclack-hermes enabled
-   - Doctor 的 identity、workspace、channel 都为 PASS
-   - Gateway 日志出现 ClickClack connected
-   - 回复中不包含任何 Token 或 Secret</code></pre>
-  </div>
+3. 启用 clickclack-hermes。
+4. 运行 Plugin 自带 doctor。
+5. 重启当前 Hermes Gateway，不要重启其他服务器或容器。
+6. 最后只报告：
+   - Plugin 是否 enabled
+   - Doctor 是否全部 PASS
+   - Gateway 是否显示 ClickClack connected
+   - 下一步应使用的 Bot handle
 
-  <h3>单独复制 Token 环境变量模板</h3>
-  <div class="copy-card">
-    <div class="copy-bar">
-      <span>.env 模板 · 真实值只写入当前 HERMES_HOME/.env</span>
-      <button class="copy-btn" type="button" data-copy="token-template">一键复制</button>
+如果需要新的 Access，请向我请求，获批后继续。</code></pre>
     </div>
-    <pre><code id="token-template">CLICKCLACK_BOT_TOKEN=&lt;PASTE_YOUR_CCB_BOT_TOKEN_HERE&gt;</code></pre>
-  </div>
 
-  <h2 id="step-4">步骤 4：在 ClickClack 做 PONG 测试</h2>
-  <ol class="checklist">
-    <li>回到 ClickClack 的 <code>#general</code> Channel。</li>
-    <li>把下面的 <code>&lt;YOUR_BOT_HANDLE&gt;</code> 换成自己的 Bot handle。</li>
-    <li>发送消息；因为配置了 <code>require_mention: true</code>，必须准确 @ Bot。</li>
-  </ol>
-
-  <div class="copy-card">
-    <div class="copy-bar">
-      <span>测试消息</span>
-      <button class="copy-btn" type="button" data-copy="pong-message">一键复制</button>
+    <h2>步骤 4：在 ClickClack 做 PONG 测试</h2>
+    <p>
+      回到 <code>#general</code>，手动发送：
+      <code>@&lt;YOUR_BOT_HANDLE&gt; 请只回复 PONG</code>。
+      因为启用了 <code>require_mention</code>，必须准确 @ 自己的 Bot。
+    </p>
+    <div class="callout good">
+      <strong>成功标准：</strong>Bot 在对应消息或 Thread 中回复 <code>PONG</code>；
+      不 @ Bot 的普通消息不会触发。
     </div>
-    <pre><code id="pong-message">@&lt;YOUR_BOT_HANDLE&gt; 请只回复 PONG</code></pre>
-  </div>
 
-  <div class="callout good">
-    <strong>成功标准：</strong>Bot 在对应消息或 Thread 中回复 <code>PONG</code>；
-    不 @ Bot 的普通消息不会触发；Gateway 重启后仍能重新连接。
-  </div>
+    <h2>阶段一常见问题</h2>
+    <table>
+      <thead><tr><th>现象</th><th>怎么处理</th></tr></thead>
+      <tbody>
+        <tr><td><code>not enabled</code></td><td>安装后正常；完成 Token 和配置后才启用。</td></tr>
+        <tr><td>没有 plugins 或 gateway</td><td>联系主持人使用备用 Studio。</td></tr>
+        <tr><td>Refresh 后仍未加载</td><td>创建新 Session，必要时重启当前 Gateway。</td></tr>
+        <tr><td>Bot 在线但不回复</td><td>检查 @handle、Channel 和 Doctor 结果。</td></tr>
+        <tr><td>HTTP 401/403</td><td>生成新 Token 后替换。</td></tr>
+      </tbody>
+    </table>
+  </section>
 
-  <h2>常见问题</h2>
-  <table>
-    <thead><tr><th>现象</th><th>怎么处理</th></tr></thead>
-    <tbody>
-      <tr><td><code>not enabled</code></td><td>步骤 1 后正常；完成 Token 和 config.yaml 后再启用。</td></tr>
-      <tr><td>Plugin 页面 Refresh 后仍未加载</td><td>Refresh 只重新发现 manifest；创建新 Session，必要时重启当前 Gateway。</td></tr>
-      <tr><td><code>config_missing</code></td><td>检查当前 HERMES_HOME/.env、Workspace ID、Channel ID 和 config.yaml 合并结果。</td></tr>
-      <tr><td><code>No allowed_user_ids configured</code></td><td>通常说明误建成 Service bot；Workshop 应创建 User-owned bot。</td></tr>
-      <tr><td>Bot 在线但不回复</td><td>检查是否准确 @handle、Channel 是否允许、Doctor 是否全部 PASS。</td></tr>
-      <tr><td>HTTP 401/403</td><td>Token 无效、已撤销或没有 Workspace/Channel 权限；生成新 Token 后替换。</td></tr>
-    </tbody>
-  </table>
+  <section class="tab-panel" id="phase-2" role="tabpanel" aria-labelledby="tab-phase-2">
+    <div class="panel-intro">
+      <h2>阶段二：Bot 自动认领 Issue 并完成 PR</h2>
+      <p>
+        参与者不需要手动挑选 Issue、手动分配、手动写 PLAN/BLOCKED/READY。
+        只需要填写自己的 Mobius 用户名，把一个 Prompt 发给自己的 Hermes。
+      </p>
+    </div>
 
-  <h2>主持人验收清单</h2>
-  <ul class="checklist">
-    <li>每位参与者使用自己的 Hermes Studio。</li>
-    <li>每人创建独立的 User-owned bot 和独立 Token。</li>
-    <li>Connection 为 Manual token，Scope 为 Read &amp; write。</li>
-    <li>Plugin 显示 enabled，Doctor 全部 PASS。</li>
-    <li>准确 mention 时回复 PONG；不 mention 时不触发。</li>
-    <li>没有真实 Token 出现在文档、Git、截图或 ClickClack Channel。</li>
-  </ul>
+    <div class="steps" aria-label="阶段二流程">
+      <div class="step-card"><b>01</b>Bot 在 THU-1 下随机选择未分配 Issue</div>
+      <div class="step-card"><b>02</b>自动分配、In Progress、评论 TAKEN</div>
+      <div class="step-card"><b>03</b>开发、测试、同步 Mobius、提交 PR</div>
+      <div class="step-card"><b>04</b>Review Agent 验收并合入 integration</div>
+    </div>
+
+    <div class="callout">
+      <strong>开始前：</strong>阶段一 PONG 已通过；Hermes 已获得 Mobius 和 GitHub
+      访问权限。遇到 Access 请求要及时允许，否则 Bot 会停下来等待。
+    </div>
+
+    <h2>任务池</h2>
+    <p>
+      独立团队：<strong>THU / 周四练习</strong>；父 Issue：<strong>THU-1</strong>。
+      Bot 只会选择没有 Assignee 且仍可开始的子 Issue。
+    </p>
+    <div class="issue-grid">
+      <div class="issue"><b>THU-2</b> · KPI Cards</div>
+      <div class="issue"><b>THU-3</b> · Hourly Chart</div>
+      <div class="issue"><b>THU-4</b> · Filters</div>
+      <div class="issue"><b>THU-5</b> · Alerts</div>
+      <div class="issue"><b>THU-6</b> · Breakdown Table</div>
+      <div class="issue reserved"><b>THU-7</b> · Analysis · 已分配 Yongcheng</div>
+      <div class="issue"><b>THU-8</b> · Data Quality</div>
+      <div class="issue"><b>THU-9</b> · Workshop Status</div>
+    </div>
+    <div class="callout warn">
+      <strong>主持人预留：</strong><code>THU-7</code> 需要计算至少三条有依据的洞察并
+      处理空数据，是预计最耗时的任务，已分配给 <strong>Yongcheng Mu</strong>。
+      其他 Bot 会因为它已有 Assignee 而自动跳过。
+    </div>
+
+    <h2>参与者只需要执行这一步</h2>
+    <p>
+      把 <code>&lt;YOUR_MOBIUS_USER_NAME&gt;</code> 替换成 Mobius 里显示的真实姓名。
+      不需要填写 Issue ID；Bot 会从 <code>THU-1</code> 自动找一个可用任务。
+    </p>
+
+    <div class="copy-card">
+      <div class="copy-bar">
+        <span>参与者 Prompt · 自动认领、开发、同步和提交</span>
+        <button class="copy-btn" type="button" data-copy="participant-prompt">一键复制</button>
+      </div>
+      <pre><code id="participant-prompt">You are my implementation agent for the Hourly Dashboard workshop.
+
+My Mobius user name: &lt;YOUR_MOBIUS_USER_NAME&gt;
+Mobius team: 周四练习 (THU)
+Parent issue: THU-1
+Repository: https://github.com/Yongcheng123/hourly-dashboard-practice
+Participant PR base: integration/workshop
+
+Execute the complete workflow for me:
+
+1. Confirm that you can read and update Mobius and can use GitHub. If access is
+   missing, ask me for that access and continue after approval. Do not stop silently.
+
+2. Read THU-1 and all of its direct child issues. Eligible issues must:
+   - have no assignee;
+   - be in Todo or Backlog;
+   - not already contain a TAKEN comment from another participant.
+
+3. Refresh the children immediately before claiming. Randomly choose one eligible
+   issue. Assign it to the exact Mobius user name I provided, change it to
+   In Progress, and add:
+   TAKEN
+   Owner: &lt;YOUR_MOBIUS_USER_NAME&gt;
+   Hermes bot: current bot
+   Started: current time
+
+4. Re-read the issue and verify that the assignee is me and the state is
+   In Progress. If another participant claimed it first, do not overwrite them;
+   choose another eligible issue and repeat. If no eligible issue remains, tell
+   me and stop without changing code.
+
+5. Read the claimed issue's full description and acceptance criteria. Add a PLAN
+   comment to that issue with the allowed files, approach, and risks. Do this
+   yourself; do not ask me to copy a PLAN template.
+
+6. Fork or clone the public repository. Create
+   feat/&lt;CLAIMED_ISSUE_ID&gt;-&lt;SHORT_NAME&gt;
+   from upstream/integration/workshop.
+
+7. Edit only the files allowed by the issue. Do not modify DashboardShell,
+   globals.css, shared data/types, package.json, or the lockfile unless the issue
+   explicitly allows it. Do not use production credentials or real campaign data.
+
+8. Implement the acceptance criteria using the existing fake data and visual
+   language. Keep the dashboard responsive and accessible.
+
+9. If blocked, add a BLOCKED comment to the claimed Mobius issue explaining the
+   blocker and what access or decision is needed, then ask me. Do not ask me to
+   write the Mobius comment manually.
+
+10. Run npm run lint and npm test. Fix failures within the allowed scope.
+
+11. Commit and push the feature branch. Open a pull request to:
+    Yongcheng123/hourly-dashboard-practice:integration/workshop
+    The PR title must include the claimed Mobius issue ID.
+
+12. Add a READY comment to the claimed Mobius issue with branch, PR URL, changed
+    files, lint result, test result, and risks. Move the issue to In Review.
+    Do this yourself; do not ask me to copy a READY template.
+
+13. Report only: claimed Issue ID/title, branch, PR URL, test results, and any
+    item that needs human review. Never merge the PR yourself.</code></pre>
+    </div>
+
+    <div class="callout good">
+      <strong>参与者完成标准：</strong>Bot 已自动认领一个 Issue；Mobius 显示
+      In Review 和 READY 评论；GitHub PR 的 Base 是
+      <code>integration/workshop</code>。
+    </div>
+
+    <h2>主持人：让 Review Agent 集成</h2>
+    <p>
+      等参与者 PR 到齐后，给主持人的 Agent GitHub 和 Mobius 权限，再发送下面
+      Prompt。Review Agent 会更新 Mobius、逐个合并到 integration，并创建最终 PR。
+    </p>
+
+    <div class="copy-card">
+      <div class="copy-bar">
+        <span>主持人 Review Agent Prompt</span>
+        <button class="copy-btn" type="button" data-copy="review-prompt">一键复制</button>
+      </div>
+      <pre><code id="review-prompt">You are the integration and review agent for the Hourly Dashboard workshop.
+
+Repository: https://github.com/Yongcheng123/hourly-dashboard-practice
+Mobius team: 周四练习 (THU)
+Parent issue: THU-1
+Participant PR base: integration/workshop
+Final branch: main
+
+1. Read THU-1 and every child issue, including assignee, state, comments, and
+   acceptance criteria.
+2. Find every PR targeting integration/workshop and match it to one THU child.
+3. For each PR verify allowed files, acceptance criteria, secrets, responsive
+   layout, accessibility, npm run lint, and npm test.
+4. If incomplete or conflicting, leave concrete PR feedback, add a BLOCKED review
+   comment to Mobius, and keep the issue In Review. Do not silently rewrite a
+   participant's feature.
+5. Merge acceptable PRs into integration/workshop one at a time.
+6. After every merge rerun npm run lint and npm test.
+7. Update the matching Mobius issue to Done and comment the merge commit.
+8. After accepted work is integrated, open one final PR from
+   integration/workshop to main. Summarize accepted features, skipped work,
+   test results, and remaining risks in THU-1.
+9. Do not merge the final PR to main. The human host decides.
+
+If GitHub or Mobius access is missing, ask the host and stop. Never expose secrets.</code></pre>
+    </div>
+
+    <h2>60 分钟时间线</h2>
+    <ul class="checklist">
+      <li><strong>0–15 分钟：</strong>阶段一，Plugin + Bot + PONG。</li>
+      <li><strong>15–20 分钟：</strong>讲解 Repo 和阶段二 Prompt。</li>
+      <li><strong>20–45 分钟：</strong>Bot 自动认领、开发、测试、PR。</li>
+      <li><strong>45–55 分钟：</strong>Review Agent 验收并合入 integration。</li>
+      <li><strong>55–60 分钟：</strong>展示组合效果、最终 PR 和 Mobius 回顾。</li>
+    </ul>
+  </section>
 
   <div class="footer">
     <strong>版本记录</strong><br>
-    2026-07-29：创建第一阶段同事操作版；加入安装 Prompt、Bot 表单、配置 Prompt、
-    Token 占位符、一键复制和现场截图。本文档会持续更新。
+    2026-07-29：合并阶段一和阶段二为双 Tab 页面；阶段二改为单个参与者 Prompt
+    自动认领 Issue、更新 Mobius、开发、测试和提交 PR；THU-7 预留给 Yongcheng。<br>
+    2026-07-29：创建 Hermes Plugin、Bot 配置和 PONG 操作指南。
   </div>
 </main>
 
 <script>
+  function activateTab(id, updateHash) {
+    document.querySelectorAll(".tab-panel").forEach((panel) => {
+      panel.classList.toggle("is-active", panel.id === id);
+    });
+    document.querySelectorAll(".tab-button").forEach((button) => {
+      button.setAttribute("aria-selected", button.dataset.tab === id ? "true" : "false");
+    });
+    if (updateHash) history.replaceState(null, "", "#" + id);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  document.querySelectorAll(".tab-button").forEach((button) => {
+    button.addEventListener("click", () => activateTab(button.dataset.tab, true));
+  });
+
+  if (location.hash === "#phase-2") activateTab("phase-2", false);
+
   function fallbackCopy(text) {
     const area = document.createElement("textarea");
     area.value = text;
@@ -505,7 +703,7 @@ gateway:
       fallbackCopy(text);
       button.textContent = "已复制";
     }
-    setTimeout(() => { button.textContent = old; }, 1600);
+    setTimeout(() => { button.textContent = old; }, 1400);
   });
 </script>
 </body>
