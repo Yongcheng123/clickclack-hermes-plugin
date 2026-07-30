@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Hermes × ClickClack Workshop 全流程指南</title>
-  <meta name="description" content="从 Hermes 接入 ClickClack，到自动认领 Mobius Issue、开发 Hourly Dashboard 和提交 PR 的完整 Workshop 指南。">
+  <meta name="description" content="从 Hermes 接入 ClickClack，到自动认领 Mobius Issue、开发 Hourly Dashboard 并通过 Mobius Patch 交付的完整 Workshop 指南。">
   <style>
     :root {
       --ink: #17211e;
@@ -248,7 +248,7 @@
   <h1>从连接 Bot，到多人协作完成一个项目</h1>
   <p class="lead">
     阶段一把每个人自己的 Hermes 接入同一个 ClickClack Channel；阶段二让各自的
-    Bot 自动认领 Mobius Issue、完成独立模块、提交 PR，并由主持人的 Review Agent 集成。
+    Bot 自动认领 Mobius Issue、完成独立模块、通过 Mobius Patch 交付，并由主持人的 Review Agent 集成。
   </p>
   <div class="meta">
     <span class="pill">总时长：约 60 分钟</span>
@@ -540,7 +540,7 @@ ClickClack connected 且能收到测试消息，就把它视为成功，不要�
 
   <section class="tab-panel" id="phase-2" role="tabpanel" aria-labelledby="tab-phase-2">
     <div class="panel-intro">
-      <h2>阶段二：Bot 自动认领 Issue 并完成 PR</h2>
+      <h2>阶段二：Bot 自动认领 Issue 并通过 Mobius Patch 交付</h2>
       <p>
         参与者不需要手动挑选 Issue、手动分配、手动写 PLAN/BLOCKED/READY。
         使用阶段一确认并连接 MCP 时填写的同一个 Mobius 用户名，在 ClickClack
@@ -553,13 +553,14 @@ ClickClack connected 且能收到测试消息，就把它视为成功，不要�
     <div class="steps" aria-label="阶段二流程">
       <div class="step-card"><b>01</b>Bot 在 THU-1 下随机选择未分配 Issue</div>
       <div class="step-card"><b>02</b>自动分配、In Progress、评论 TAKEN</div>
-      <div class="step-card"><b>03</b>开发、测试、同步 Mobius、提交 PR</div>
-      <div class="step-card"><b>04</b>Review Agent 验收并合入 integration</div>
+      <div class="step-card"><b>03</b>开发、测试、生成并上传 Patch</div>
+      <div class="step-card"><b>04</b>Review Agent 下载 Patch 并集成</div>
     </div>
 
     <div class="callout">
-      <strong>开始前：</strong>阶段一 PONG 已通过；Hermes 已获得 Mobius 和 GitHub
-      访问权限。遇到 Access 请求要及时允许，否则 Bot 会停下来等待。
+      <strong>开始前：</strong>阶段一 PONG 已通过；Hermes 已获得 Mobius、Terminal、
+      文件读写和网络访问权限。参与者不需要 GitHub 登录或 PAT。遇到 Access 请求
+      要及时允许，否则 Bot 会停下来等待。
     </div>
     <div class="callout good">
       <strong>当前项目基线：</strong>Repo 已内置 2026-07-24 至 2026-07-28 的
@@ -603,7 +604,7 @@ ClickClack connected 且能收到测试消息，就把它视为成功，不要�
 
     <div class="copy-card">
       <div class="copy-bar">
-        <span>参与者 Prompt · 自动认领、开发、同步和提交</span>
+        <span>参与者 Prompt · 自动认领、开发并上传 Mobius Patch</span>
         <button class="copy-btn" type="button" data-copy="participant-prompt">一键复制</button>
       </div>
       <pre><code id="participant-prompt">开始 Hourly Dashboard Workshop 阶段二。
@@ -611,9 +612,11 @@ ClickClack connected 且能收到测试消息，就把它视为成功，不要�
 我的 Mobius 用户名：&lt;YOUR_MOBIUS_USER_NAME&gt;
 父 Issue：THU-1
 Repo：https://github.com/Yongcheng123/hourly-dashboard-practice
-PR Base：integration/workshop
+基线分支：integration/workshop
+交付方式：Mobius Patch
 
-请持续执行到 PR 创建完成；只有缺少 Access 或遇到真实阻塞时才问我。
+请持续执行到 Patch 上传并将 Issue 改为 In Review；只有缺少 Access 或遇到
+真实阻塞时才问我。不要索取 GitHub Token。
 
 1. 刷新 THU-1 的直接子 Issues，随机认领一个满足以下条件的任务：
    无 Assignee、状态为 Todo/Backlog、没有他人的 TAKEN 评论。
@@ -624,33 +627,37 @@ PR Base：integration/workshop
    WORKSHOP.md 和 CONTRIBUTING.md。Issue 是允许修改文件和验收范围的权威来源。
    在 Mobius 评论 PLAN，然后直接开始开发。
 
-3. Fork 或 Clone Repo，以 upstream/integration/workshop 为起点创建：
+3. 匿名 Clone 公开 Repo，以 origin/integration/workshop 的最新 Commit 为起点，
+   记录准确的 Base Commit SHA，并创建本地分支：
    feat/&lt;ISSUE_ID&gt;-&lt;SHORT_NAME&gt;
    只修改 Issue 允许的文件，不扩大任务范围。
 
 4. 完成功能并运行 npm run lint 和 npm test；只在允许范围内修复问题。
 
-5. Commit、Push，并向
-   Yongcheng123/hourly-dashboard-practice:integration/workshop 创建 PR。
-   PR 标题必须包含 Mobius Issue ID。
+5. 在本地 Commit，不要 Push。生成相对于 Base Commit SHA 的完整 Git Patch：
+   &lt;ISSUE_ID&gt;.patch
+   Patch 必须包含全部修改且只能涉及 Issue 允许的文件。生成后检查 Patch
+   非空，并确认不包含 Token、凭据或其他任务的文件。
 
-6. 在 Mobius 评论 READY，包含 Branch、PR URL、修改文件、测试结果和风险，
-   然后把 Issue 改为 In Review。
-   遇到阻塞时先评论 BLOCKED，再向我说明需要的 Access 或决策。
+6. 使用 Mobius MCP 把 .patch 文件上传到已认领的 Issue。在 Mobius 评论 READY，
+   包含 Base Commit SHA、本地 Branch、修改文件、Lint/Test 结果、风险和 Patch
+   附件链接，然后把 Issue 改为 In Review。
+   如果上传失败或 Patch 无法生成，先评论 BLOCKED，再向我说明真实阻塞。
 
-7. 最后只报告 Issue、Branch、PR、测试结果和人工检查事项。不要自行合并 PR。</code></pre>
+7. 最后只报告 Issue、Patch 文件名、Mobius 附件链接、READY 评论 ID、测试结果
+   和人工检查事项。不要 Push，不要创建或合并 PR。</code></pre>
     </div>
 
     <div class="callout good">
       <strong>参与者完成标准：</strong>Bot 已自动认领一个 Issue；Mobius 显示
-      In Review 和 READY 评论；GitHub PR 的 Base 是
-      <code>integration/workshop</code>。
+      In Review 和 READY 评论；Issue 中包含可下载的 <code>.patch</code> 附件、
+      Base Commit SHA 和测试结果。
     </div>
 
     <h2>主持人：让 Review Agent 集成</h2>
     <p>
-      等参与者 PR 到齐后，给主持人的 Agent GitHub 和 Mobius 权限，再发送下面
-      Prompt。Review Agent 会更新 Mobius、逐个合并到 integration，并创建最终 PR。
+      等参与者 Patch 到齐后，给主持人的 Agent GitHub 和 Mobius 权限，再发送下面
+      Prompt。Review Agent 会下载并验收 Patch、逐个集成到 integration，并创建最终 PR。
     </p>
 
     <div class="copy-card">
@@ -663,22 +670,26 @@ PR Base：integration/workshop
 代码仓库：https://github.com/Yongcheng123/hourly-dashboard-practice
 Mobius 团队：周四练习（THU）
 父 Issue：THU-1
-参与者 PR 的 Base 分支：integration/workshop
+参与者交付方式：Mobius Issue 中的 .patch 附件
+集成分支：integration/workshop
 最终分支：main
 
 1. 读取 THU-1 及其全部子 Issue，包括 Assignee、状态、评论和
    Acceptance Criteria。
-2. 只找出仍然 Open、以 integration/workshop 为 Base、且 Head 分支符合
-   feat/THU-* 的 PR，并把每个 PR 与对应的 THU 子 Issue 匹配。
-3. 逐个检查 PR：是否只修改允许的文件、是否满足 Acceptance Criteria、
-   是否包含 Secret、响应式布局、可访问性、npm run lint 和 npm test；同时
+2. 找出所有 In Review、包含 READY 评论和 .patch 附件的 THU 子 Issue。
+   下载 Patch，并读取 READY 中记录的 Base Commit SHA、修改文件和测试结果。
+3. 从 integration/workshop 的最新代码开始，逐个检查 Patch：Base Commit 是否
+   可追溯、是否只修改允许的文件、是否满足 Acceptance Criteria、是否包含 Secret、
+   响应式布局、可访问性、npm run lint 和 npm test；同时
    确认三数据源切换、345 条快照数据、18 项明细表和 Agent_B 9/24 缺口没有
    被参与者功能破坏。
-4. 如果实现不完整或存在冲突，留下具体的 PR Review 意见，在 Mobius 添加
+4. 对每个 Patch 先运行 git apply --check，再使用 git apply --3way 应用。
+   如果实现不完整、Patch 无法应用或存在冲突，在 Mobius 添加
    BLOCKED Review 评论，并让 Issue 保持 In Review。不要静默重写参与者的功能。
-5. 将通过检查的 PR 逐个合并到 integration/workshop。
-6. 每次合并后重新运行 npm run lint 和 npm test。
-7. 把对应的 Mobius Issue 更新为 Done，并评论记录 Merge Commit。
+5. 每成功应用一个 Patch，运行 npm run lint 和 npm test，并创建包含 THU Issue ID
+   的独立 Commit。
+6. 把对应的 Mobius Issue 更新为 Done，并评论记录 Integration Commit。
+7. 将全部通过验收的 Commit Push 到 integration/workshop。
 8. 集成所有通过验收的工作后，创建一个从 integration/workshop 到 main 的
    最终 PR；在 THU-1 汇总已接收功能、跳过的工作、测试结果和剩余风险。
 9. 不要把最终 PR 合并到 main，由人类主持人做最终决定。
@@ -690,7 +701,7 @@ Mobius 团队：周四练习（THU）
     <ul class="checklist">
       <li><strong>0–15 分钟：</strong>阶段一，Plugin + Bot + PONG。</li>
       <li><strong>15–20 分钟：</strong>讲解 Repo 和阶段二 Prompt。</li>
-      <li><strong>20–45 分钟：</strong>Bot 自动认领、开发、测试、PR。</li>
+      <li><strong>20–45 分钟：</strong>Bot 自动认领、开发、测试、上传 Patch。</li>
       <li><strong>45–55 分钟：</strong>Review Agent 验收并合入 integration。</li>
       <li><strong>55–60 分钟：</strong>展示组合效果、最终 PR 和 Mobius 回顾。</li>
     </ul>
@@ -698,6 +709,9 @@ Mobius 团队：周四练习（THU）
 
   <div class="footer">
     <strong>版本记录</strong><br>
+    2026-07-30：阶段二改为 Mobius Patch 交付；参与者无需 GitHub 登录或 PAT，
+    匿名读取公开 Repo、本地开发测试并上传 <code>.patch</code> 到 Mobius；
+    Review Agent 下载、验收、应用并创建最终 GitHub PR。<br>
     2026-07-30：阶段二参与者 Prompt 从 13 步精简为 7 步；明确在 ClickClack
     <code>#general</code> 准确 @ 自己的 Bot，并让每位参与者使用独立 Thread；
     Review Agent 只处理 Open、Base 为 <code>integration/workshop</code>、
