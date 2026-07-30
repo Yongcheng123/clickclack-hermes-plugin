@@ -456,28 +456,27 @@ https://github.com/Yongcheng123/clickclack-hermes-plugin
 
     <div class="copy-card">
       <div class="copy-bar">
-        <span>Prompt 2 · 一次配置 Mobius + ClickClack，只重启一次</span>
+        <span>Prompt 2 · 直接配置 Mobius + ClickClack</span>
         <button class="copy-btn" type="button" data-copy="config-prompt">一键复制</button>
       </div>
-      <pre><code id="config-prompt">请在当前 Hermes Studio 一次完成 Mobius MCP 和 ClickClack Plugin 配置。
+      <pre><code id="config-prompt">请继续在当前 Hermes Studio 完成配置。沿用 Prompt 1 已确认的
+Profile 和 HERMES_HOME，不要重新调查安装路径或 Hermes 源码。
 
-只操作当前 Studio。下面的值只授权用于本次 Workshop。不要在回复、工具输出、
-日志或 Git 中显示任何 Token。
+下面的 Token 已明确授权写入 HERMES_HOME/.env。允许它们出现在安全写文件
+工具的输入中，但不要在最终回复、终端输出、config.yaml 或 Git 中复述。
 
-MY_MOBIUS_USER_NAME: &lt;YOUR_MOBIUS_USER_NAME&gt;
 MOBIUS_PAT: &lt;MOBIUS_PAT_OR_KEEP_EXISTING&gt;
 CLICKCLACK_BOT_TOKEN: &lt;PASTE_YOUR_CCB_BOT_TOKEN_HERE&gt;
 
-请执行：
-1. 确认使用 Prompt 1 找到的同一个 Profile 和 HERMES_HOME。
-2. 备份现有 config.yaml；后续只做合并，保留所有现有模型、MCP、Gateway、
+直接执行，不要再次询问：
+1. 备份现有 config.yaml；后续只做合并，保留所有现有模型、MCP、Gateway、
    Memory 和其他配置。
-3. 把 CLICKCLACK_BOT_TOKEN 安全写入 HERMES_HOME/.env。
+2. 把 CLICKCLACK_BOT_TOKEN 写入 HERMES_HOME/.env。
    - 如果 MOBIUS_PAT 是完整的 mob_… Token，也写为 MOBIUS_PAT；
    - 如果值是 KEEP_EXISTING，保留当前可用的 Mobius Header 和凭证，不要
      把 KEEP_EXISTING 写进任何文件。
-   将 .env 权限设为 0600，不要写入 Plugin 目录、日志或 Git。
-4. 如果 Mobius 状态是 NEEDS_KEY，合并以下 MCP 配置。Header 必须引用环境
+   将 .env 权限设为 0600，不要写入 Plugin 目录或 Git。
+3. 如果 Mobius 状态是 NEEDS_KEY，合并以下 MCP 配置。Header 必须引用环境
    变量，不要把真实 PAT 明文写入 config.yaml：
 
 mcp_servers:
@@ -491,7 +490,7 @@ mcp_servers:
 
    如果 Mobius 状态是 CONNECTED 且 MOBIUS_PAT 为 KEEP_EXISTING，保留现有
    mcp_servers.mobius，不要创建重复条目。
-5. 合并以下 ClickClack 配置：
+4. 合并以下 ClickClack 配置：
 
 plugins:
   enabled:
@@ -502,6 +501,7 @@ gateway:
     clickclack:
       enabled: true
       home_channel:
+        platform: "clickclack"
         chat_id: "channel:chn_01kynt5edyr9t13dd5nxws7nvf"
         name: "general"
       extra:
@@ -517,26 +517,23 @@ gateway:
         thread_mode: "always"
         skip_history_on_first_start: true
 
-6. 启用 clickclack-hermes，并运行 Plugin 自带 doctor。
-7. 在重启前检查 YAML 可解析、Plugin 配置完整、Mobius MCP 只有一个条目，
-   且两个 Secret 都未出现在 config.yaml 或输出中。
-8. 现在才重启当前 Hermes Gateway 一次；不要重启其他服务器或容器，也不要
-   在此前单独重载或重启 MCP。
-9. Gateway 恢复后：
+5. 启用 clickclack-hermes，运行 Plugin doctor，并检查 YAML 可解析、Mobius
+   只有一个条目、Token 未写入 config.yaml。
+6. 检查完成前不要重启。检查通过后重启当前 Gateway；正常只重启一次。
+   如果首次启动因配置错误失败，修复后允许再启动一次，不要停下来询问。
+   不要重启服务器或其他容器。
+7. Gateway 恢复后：
    - 验证 ClickClack 显示 connected；
    - 验证 Mobius MCP 已注册工具；
    - 调用一次 Mobius list_teams，只读确认能看到“周四练习（THU）”；
    - 不要在 Mobius 创建、修改或评论 Issue。
-10. 最后只报告：
-   - Mobius 用户名
+8. 最后只报告：
    - Mobius MCP 是否 connected，list_teams 是否成功
    - Plugin 是否 enabled
    - Doctor 是否全部 PASS
    - Gateway 是否显示 ClickClack connected
-   - 本次 Gateway 重启次数（必须为 1）
    - 下一步应使用的 Bot handle
-
-如果需要新的 Access，请向我请求，获批后继续。</code></pre>
+   如果失败，只报告具体失败步骤和错误，不要研究 Hermes 源码。</code></pre>
     </div>
 
     <h2>步骤 5：在 ClickClack 做 PONG 测试</h2>
@@ -748,6 +745,9 @@ Mobius 团队：周四练习（THU）
 
   <div class="footer">
     <strong>版本记录</strong><br>
+    2026-07-29：根据首次完整安装回放精简 Prompt 2；补齐
+    <code>home_channel.platform</code>，明确安全写入 Token，并允许首次启动因配置
+    错误失败时修复后再启动一次。<br>
     2026-07-29：同步三张 Chime 固定快照基线；更新 THU-2–THU-9 的实际模块、
     保护文件、参与者 Prompt 和 Review 验收范围。<br>
     2026-07-29：阶段一增加 Mobius MCP 检查和 PAT 配置；MCP 与 ClickClack

@@ -304,6 +304,7 @@ gateway:
     clickclack:
       enabled: true
       home_channel:
+        platform: "clickclack"
         chat_id: "channel:chn_REPLACE_ME"
         name: "hermes-sprint"
       extra:
