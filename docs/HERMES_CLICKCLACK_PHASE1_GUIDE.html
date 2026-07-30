@@ -484,11 +484,12 @@ Bot Token:
 不要检测或改写现有 Mobius 配置。
 
 直接完成配置，不要重新调查 Hermes 源码。
-所有配置完成后，在已安装的 clickclack-hermes Plugin 目录中找到并运行：
+所有配置完成后，必须在已安装的 clickclack-hermes Plugin 目录中找到并运行：
 scripts/restart_gateway_safely.py
 
 如果搜索工具找不到该文件，不要判定文件缺失。HERMES_HOME 通常是隐藏目录，
 请通过 Terminal 在当前 HERMES_HOME/plugins/clickclack-hermes/scripts/ 下确认。
+本次 Workshop 不接受其他 Gateway 启动或重载方式。
 不要把长期运行的 Gateway 绑定在有超时限制的 Terminal 前台，不要使用
 timeout，也不要用持续的 logs --follow 等待连接。
 
@@ -527,7 +528,7 @@ ClickClack connected 且能收到测试消息，就把它视为成功，不要�
         <tr><td>没有 plugins 或 gateway</td><td>联系主持人使用备用 Studio。</td></tr>
         <tr><td>Mobius <code>401/403</code></td><td>先确认 Header 是 <code>Authorization: Bearer mob_…</code>；不能直接写 <code>Authorization: mob_…</code>。格式正确仍失败时，再生成新 PAT 并更新同一个 <code>mobius-mcp</code>。</td></tr>
         <tr><td>Mobius 工具未出现</td><td>确认 Prompt 1B 中的 PAT 已替换、URL 没有 Markdown 方括号；统一重载后创建一个新 Session，不要添加第二个同名 MCP。</td></tr>
-        <tr><td>Gateway 约 90 秒后下线</td><td>说明它被前台 Terminal 超时终止；在 Plugin 安装目录找到并运行 <code>scripts/restart_gateway_safely.py</code>。不要使用 <code>timeout</code> 或让长期 Gateway 绑定在前台 Terminal。</td></tr>
+        <tr><td>Gateway 约 90 秒后下线</td><td>说明它被前台 Terminal 超时终止。本次 Workshop 必须在 Plugin 安装目录运行 <code>scripts/restart_gateway_safely.py</code>，不接受其他启动或重载方式。</td></tr>
         <tr><td>安全重启脚本返回 <code>exit 4 / WARN</code></td><td>这可能是日志路径导致的假告警。先检查 canonical <code>gateway.log</code>、<code>gateway_state.json</code> 和 ClickClack 的真实消息收发；已经 connected 且能收到消息时不要再次重启。</td></tr>
         <tr><td>搜索不到 <code>restart_gateway_safely.py</code></td><td><code>search_files</code> 可能跳过 <code>~/.hermes</code> 等隐藏目录。使用 Terminal 在当前 <code>HERMES_HOME/plugins/clickclack-hermes/scripts/</code> 下确认，不要直接判定文件缺失。</td></tr>
         <tr><td>Refresh 后仍未加载</td><td>创建新 Session，必要时重启当前 Gateway。</td></tr>
