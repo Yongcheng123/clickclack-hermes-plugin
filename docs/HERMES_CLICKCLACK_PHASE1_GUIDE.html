@@ -770,7 +770,12 @@ Mobius 团队：周四练习（THU）
     button.addEventListener("click", () => activateTab(button.dataset.tab, true));
   });
 
-  if (location.hash === "#phase-2") activateTab("phase-2", false);
+  function activateTabFromHash() {
+    activateTab(location.hash === "#phase-2" ? "phase-2" : "phase-1", false);
+  }
+
+  window.addEventListener("hashchange", activateTabFromHash);
+  activateTabFromHash();
 
   function fallbackCopy(text) {
     const area = document.createElement("textarea");
