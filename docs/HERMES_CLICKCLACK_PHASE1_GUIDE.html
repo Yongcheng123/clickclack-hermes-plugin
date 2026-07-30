@@ -481,16 +481,14 @@ Bot Token:
 不要在回复、终端输出、config.yaml 或 Git 中复述 Token。
 不要检测或改写现有 Mobius 配置。
 
-直接完成配置，不要重新调查 Hermes 安装路径或源码。
-所有配置完成后，使用 Plugin 自带的安全重启脚本：
+直接完成配置，不要重新调查 Hermes 源码。
+所有配置完成后，根据当前 Hermes 的实际运行方式，安全重载当前 Gateway，
+使新配置生效，并进行有界状态检查。
 
-python3 "${HERMES_HOME:-$HOME/.hermes}/plugins/clickclack-hermes/scripts/restart_gateway_safely.py" \
-  --hermes-home "${HERMES_HOME:-$HOME/.hermes}"
+不要把长期运行的 Gateway 绑定在有超时限制的 Terminal 前台，不要使用
+timeout，也不要用持续的 logs --follow 等待连接。
 
-不要直接在 Terminal 前台运行 hermes gateway restart，不要使用 timeout，
-不要用持续的 logs --follow 等待连接。脚本返回后再继续验证。
-
-如果脚本报告明确的配置错误，修复后允许再运行一次，不需要询问。
+如果重载时报告明确的配置错误，修复后允许再重载一次，不需要询问。
 
 最后只告诉我：
 - Plugin Doctor 是否 PASS
@@ -521,7 +519,7 @@ python3 "${HERMES_HOME:-$HOME/.hermes}/plugins/clickclack-hermes/scripts/restart
         <tr><td>没有 plugins 或 gateway</td><td>联系主持人使用备用 Studio。</td></tr>
         <tr><td>Mobius <code>401/403</code></td><td>在 Mobius 开发者页重新生成 PAT，用 Prompt 1B 的 HTTP MCP 格式更新同一个 <code>mobius-mcp</code>。</td></tr>
         <tr><td>Mobius 工具未出现</td><td>确认 Prompt 1B 中的 PAT 已替换、URL 没有 Markdown 方括号；统一重载后创建一个新 Session，不要添加第二个同名 MCP。</td></tr>
-        <tr><td>Gateway 约 90 秒后下线</td><td>说明它被前台 Terminal 超时终止；更新 Plugin 后使用 <code>restart_gateway_safely.py</code>，不要用 <code>timeout</code> 或前台 Gateway。</td></tr>
+        <tr><td>Gateway 约 90 秒后下线</td><td>说明它被前台 Terminal 超时终止；根据当前 Hermes 的运行方式安全重载，不要使用 <code>timeout</code> 或让长期 Gateway 绑定在前台 Terminal。</td></tr>
         <tr><td>Refresh 后仍未加载</td><td>创建新 Session，必要时重启当前 Gateway。</td></tr>
         <tr><td>Bot 在线但不回复</td><td>检查 @handle、Channel 和 Doctor 结果。</td></tr>
         <tr><td>ClickClack <code>401/403</code></td><td>生成新 Bot Token 后替换。</td></tr>
@@ -710,6 +708,8 @@ Mobius 团队：周四练习（THU）
 
   <div class="footer">
     <strong>版本记录</strong><br>
+    2026-07-30：Prompt 2 移除固定 Python 路径和指定脚本命令，改为让 AI
+    根据当前 Hermes 的运行方式安全重载 Gateway，提升不同部署环境的兼容性。<br>
     2026-07-30：阶段一不再让 AI 预检测 Mobius；Prompt 1 拆为“已连接”
     和“未连接”两个版本。未连接版本由参与者先生成 PAT，再使用标准 HTTP MCP
     JSON 配置；最终统一重载后验证 Mobius 和 ClickClack。<br>
