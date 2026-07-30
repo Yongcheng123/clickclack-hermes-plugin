@@ -543,9 +543,10 @@ ClickClack connected 且能收到测试消息，就把它视为成功，不要�
       <h2>阶段二：Bot 自动认领 Issue 并完成 PR</h2>
       <p>
         参与者不需要手动挑选 Issue、手动分配、手动写 PLAN/BLOCKED/READY。
-        使用阶段一确认并连接 MCP 时填写的同一个 Mobius 用户名，把一个 Prompt
-        发给自己的 Hermes。当前基线已经包含三张 Chime 数据源、345 条小时记录
-        和完整 18 项指标；参与者只完成各自隔离的 Feature。
+        使用阶段一确认并连接 MCP 时填写的同一个 Mobius 用户名，在 ClickClack
+        <code>#general</code> 中准确 @ 自己的 Bot，并把后续协作留在各自独立的
+        Thread。当前基线已经包含三张 Chime 数据源、345 条小时记录和完整 18 项
+        指标；参与者只完成各自隔离的 Feature。
       </p>
     </div>
 
@@ -594,72 +595,50 @@ ClickClack connected 且能收到测试消息，就把它视为成功，不要�
       Mobius 真实姓名。不需要填写 Issue ID；Bot 会从 <code>THU-1</code>
       自动找一个可用任务。
     </p>
+    <ol class="checklist">
+      <li>在 ClickClack <code>#general</code> 中输入并选择 <code>@自己的 Bot</code>。</li>
+      <li>在同一条消息中粘贴下面的 Prompt 并发送。</li>
+      <li>立即进入这条消息的 Thread；后续 Access、问题和结果都留在该 Thread。</li>
+    </ol>
 
     <div class="copy-card">
       <div class="copy-bar">
         <span>参与者 Prompt · 自动认领、开发、同步和提交</span>
         <button class="copy-btn" type="button" data-copy="participant-prompt">一键复制</button>
       </div>
-      <pre><code id="participant-prompt">你是我在 Hourly Dashboard Workshop 中的开发 Agent。
+      <pre><code id="participant-prompt">开始 Hourly Dashboard Workshop 阶段二。
 
 我的 Mobius 用户名：&lt;YOUR_MOBIUS_USER_NAME&gt;
-Mobius 团队：周四练习（THU）
 父 Issue：THU-1
-代码仓库：https://github.com/Yongcheng123/hourly-dashboard-practice
-参与者 PR 的 Base 分支：integration/workshop
+Repo：https://github.com/Yongcheng123/hourly-dashboard-practice
+PR Base：integration/workshop
 
-请替我完整执行以下流程：
+请持续执行到 PR 创建完成；只有缺少 Access 或遇到真实阻塞时才问我。
 
-1. 先确认你可以读取和更新 Mobius，并且可以使用 GitHub。如果缺少权限，
-   立即向我申请 Access；我批准后继续执行，不要静默停止。
+1. 刷新 THU-1 的直接子 Issues，随机认领一个满足以下条件的任务：
+   无 Assignee、状态为 Todo/Backlog、没有他人的 TAKEN 评论。
+   将它分配给我的 Mobius 用户名，改为 In Progress，评论 TAKEN，并重新读取确认。
+   如果被别人抢先认领，选择另一个；没有可用任务时停止。
 
-2. 读取 THU-1 及其所有直接子 Issue。可认领的 Issue 必须同时满足：
-   - 没有 Assignee；
-   - 状态为 Todo 或 Backlog；
-   - 评论中没有其他参与者留下的 TAKEN。
+2. 阅读该 Issue 的完整描述和 Acceptance Criteria，以及 Repo 中的
+   WORKSHOP.md 和 CONTRIBUTING.md。Issue 是允许修改文件和验收范围的权威来源。
+   在 Mobius 评论 PLAN，然后直接开始开发。
 
-3. 在认领前立即刷新一次子 Issue 列表，从符合条件的 Issue 中随机选择一个。
-   把它分配给我上面提供的准确 Mobius 用户名，将状态改为 In Progress，
-   并添加以下评论：
-   TAKEN
-   Owner: &lt;YOUR_MOBIUS_USER_NAME&gt;
-   Hermes bot: current bot
-   Started: current time
+3. Fork 或 Clone Repo，以 upstream/integration/workshop 为起点创建：
+   feat/&lt;ISSUE_ID&gt;-&lt;SHORT_NAME&gt;
+   只修改 Issue 允许的文件，不扩大任务范围。
 
-4. 重新读取该 Issue，确认 Assignee 是我且状态为 In Progress。如果其他参与者
-   抢先认领，不要覆盖对方；改选另一个可认领 Issue 并重复上述步骤。如果已经
-   没有可认领的 Issue，告诉我并停止，不要修改代码。
+4. 完成功能并运行 npm run lint 和 npm test；只在允许范围内修复问题。
 
-5. 阅读已认领 Issue 的完整描述和 Acceptance Criteria。由你直接在该 Issue
-   添加 PLAN 评论，写明允许修改的文件、实现方案和风险；不要让我手动复制
-   或填写 PLAN 模板。
+5. Commit、Push，并向
+   Yongcheng123/hourly-dashboard-practice:integration/workshop 创建 PR。
+   PR 标题必须包含 Mobius Issue ID。
 
-6. Fork 或 Clone 公开仓库，以 upstream/integration/workshop 为起点创建：
-   feat/&lt;CLAIMED_ISSUE_ID&gt;-&lt;SHORT_NAME&gt;
+6. 在 Mobius 评论 READY，包含 Branch、PR URL、修改文件、测试结果和风险，
+   然后把 Issue 改为 In Review。
+   遇到阻塞时先评论 BLOCKED，再向我说明需要的 Access 或决策。
 
-7. 只修改 Issue 明确允许的文件。除非 Issue 明确允许，否则不要修改
-   DashboardShell、RawHourlyTable、SourceComparisonTable、globals.css、
-   chime 数据文件、共享 data/types、package.json 或 lockfile。
-   不要使用生产环境凭证，也不要添加仓库快照之外的真实 Campaign 数据。
-
-8. 使用仓库现有的三张 Chime 固定快照和视觉风格完成 Acceptance Criteria。
-   不连接实时 API，不伪造 Agent_B 缺失小时，并保持 Dashboard 响应式和可访问。
-
-9. 如果遇到阻塞，由你直接在已认领的 Mobius Issue 添加 BLOCKED 评论，说明
-   阻塞原因以及需要的 Access 或决策，然后再向我提问；不要让我手动写评论。
-
-10. 运行 npm run lint 和 npm test，并在允许修改的范围内修复失败项。
-
-11. Commit 并 Push Feature Branch，然后向以下 Base 创建 Pull Request：
-    Yongcheng123/hourly-dashboard-practice:integration/workshop
-    PR 标题必须包含已认领的 Mobius Issue ID。
-
-12. 由你直接在已认领的 Mobius Issue 添加 READY 评论，包含 Branch、PR URL、
-    修改文件、Lint 结果、Test 结果和风险，并把 Issue 改为 In Review；
-    不要让我手动复制或填写 READY 模板。
-
-13. 最后只向我报告：认领的 Issue ID/标题、Branch、PR URL、测试结果，以及
-    需要人工检查的事项。绝对不要自行合并 PR。</code></pre>
+7. 最后只报告 Issue、Branch、PR、测试结果和人工检查事项。不要自行合并 PR。</code></pre>
     </div>
 
     <div class="callout good">
@@ -689,8 +668,8 @@ Mobius 团队：周四练习（THU）
 
 1. 读取 THU-1 及其全部子 Issue，包括 Assignee、状态、评论和
    Acceptance Criteria。
-2. 找出所有以 integration/workshop 为 Base 的 PR，并把每个 PR 与对应的
-   THU 子 Issue 匹配。
+2. 只找出仍然 Open、以 integration/workshop 为 Base、且 Head 分支符合
+   feat/THU-* 的 PR，并把每个 PR 与对应的 THU 子 Issue 匹配。
 3. 逐个检查 PR：是否只修改允许的文件、是否满足 Acceptance Criteria、
    是否包含 Secret、响应式布局、可访问性、npm run lint 和 npm test；同时
    确认三数据源切换、345 条快照数据、18 项明细表和 Agent_B 9/24 缺口没有
@@ -719,6 +698,10 @@ Mobius 团队：周四练习（THU）
 
   <div class="footer">
     <strong>版本记录</strong><br>
+    2026-07-30：阶段二参与者 Prompt 从 13 步精简为 7 步；明确在 ClickClack
+    <code>#general</code> 准确 @ 自己的 Bot，并让每位参与者使用独立 Thread；
+    Review Agent 只处理 Open、Base 为 <code>integration/workshop</code>、
+    Head 为 <code>feat/THU-*</code> 的 PR。<br>
     2026-07-30：修正 Mobius MCP Header；服务端要求
     <code>Authorization: Bearer mob_…</code>，直接使用
     <code>Authorization: mob_…</code> 会返回 401。<br>
