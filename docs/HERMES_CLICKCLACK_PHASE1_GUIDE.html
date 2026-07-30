@@ -271,15 +271,17 @@
     </div>
 
     <div class="steps" aria-label="阶段一流程">
-      <div class="step-card"><b>01</b>让 Hermes 安装 Plugin，并及时允许 Access</div>
-      <div class="step-card"><b>02</b>安装期间，在 ClickClack 创建个人 Bot</div>
-      <div class="step-card"><b>03</b>把 Token 交给 Hermes，一次配置并启用</div>
-      <div class="step-card"><b>04</b>在 Channel 里完成 PONG 测试</div>
+      <div class="step-card"><b>01</b>检查 Mobius MCP，同时安装 Plugin</div>
+      <div class="step-card"><b>02</b>准备 Mobius PAT 和 ClickClack Bot Token</div>
+      <div class="step-card"><b>03</b>一次合并全部配置，只重启一次 Gateway</div>
+      <div class="step-card"><b>04</b>验证 Mobius，并在 Channel 完成 PONG</div>
     </div>
 
     <div class="callout">
       <strong>开始前需要：</strong>自己的 Hermes Studio Web UI、可登录的 GitHub
-      账号，以及访问
+      账号、自己的准确 Mobius 显示名，以及访问
+      <a href="https://mobius.feedmob.com/" target="_blank" rel="noreferrer">Mobius</a>
+      和
       <a href="https://clickclack-ken-team.feedmob.it.com/app" target="_blank" rel="noreferrer">Hermes Workshop ClickClack</a>
       的权限。
     </div>
@@ -309,41 +311,64 @@
       </p>
     </div>
 
-    <h2>步骤 1：让 Hermes 安装 Plugin</h2>
+    <div class="callout good">
+      <strong>本阶段只重启一次：</strong>先检查或补齐 Mobius MCP，再完成
+      ClickClack Plugin 和 Bot 配置；所有内容合并完成后才重启 Gateway。
+      不要为 MCP 和 Plugin 分别重启。
+    </div>
+
+    <h2>步骤 1：检查 Mobius MCP，同时安装 Plugin</h2>
     <ol class="checklist">
+      <li>登录 Mobius，在左下角账户区域确认自己的准确显示名。</li>
       <li>登录自己的 Hermes Studio，开启一个新会话。</li>
-      <li>复制下面 Prompt 发给 Hermes。</li>
-      <li>看到 Access 请求立即允许；Hermes 工作时同步进行步骤 2。</li>
+      <li>替换 Prompt 中的姓名后发给 Hermes；看到 Access 请求立即允许。</li>
+      <li>Hermes 检查和安装期间，同步进行步骤 2 和步骤 3。</li>
     </ol>
 
     <div class="copy-card">
       <div class="copy-bar">
-        <span>Prompt 1 · 安装并检查 Plugin</span>
+        <span>Prompt 1 · 检查 Mobius MCP，并安装 Plugin</span>
         <button class="copy-btn" type="button" data-copy="install-prompt">一键复制</button>
       </div>
-      <pre><code id="install-prompt">请在当前 Hermes Studio 安装这个 Platform Plugin：
+      <pre><code id="install-prompt">我的 Mobius 用户名：&lt;YOUR_MOBIUS_USER_NAME&gt;
+
+请在当前 Hermes Studio 完成预检查，并安装这个 Platform Plugin：
 https://github.com/Yongcheng123/clickclack-hermes-plugin
 
 要求：
 1. 只操作当前 Studio；确认当前 Profile、实际 HERMES_HOME，以及存在
-   plugins 和 gateway 命令。不要因为具体版本号暂停安装。
+   plugins、gateway 和 MCP 能力。不要因为具体版本号暂停。
 2. 如果需要 Terminal、文件、Git 或网络 Access，立即向我请求；获批后继续。
 3. 如果 hermes 不在 PATH，使用 /opt/hermes/.venv/bin/hermes。
-4. 未安装时运行：
+4. 安全检查现有 config.yaml 中是否已经有 mcp_servers.mobius。不要显示任何
+   Authorization Header、Token、PAT 或 Secret。
+5. 如果 Mobius MCP 已注册，调用一次只读的 list_teams 验证：
+   - 调用成功：记录为 CONNECTED；
+   - 没有配置、没有工具、401/403 或调用失败：记录为 NEEDS_KEY。
+   本步骤不要修改 MCP 配置。
+6. Plugin 未安装时运行：
    hermes plugins install Yongcheng123/clickclack-hermes-plugin --no-enable
    已安装时运行：
    hermes plugins update clickclack-hermes
-5. 暂时不要启用，也不要索取 Token；停在 not enabled，等待我下一条消息。
-6. 安装器创建 Plugin 目录的模板 .env 是正常的，但不要把真实 Token 写进去。
-7. 不要覆盖现有模型、MCP、Gateway、Memory 或其他配置。
+7. 暂时不要启用 Plugin，不要修改 config.yaml，不要重载 MCP，也不要重启
+   Gateway；停在 not enabled，等待我把所有配置一次交给你。
+8. 安装器创建 Plugin 目录的模板 .env 是正常的，但不要把真实 Token 写进去。
+9. 不要覆盖现有模型、MCP、Gateway、Memory 或其他配置。
 
-完成后只报告：HERMES_HOME、安装路径、Plugin 状态，以及 plugins/gateway
-命令是否可用。</code></pre>
+完成后只报告：
+- 我提供的 Mobius 用户名
+- Mobius MCP：CONNECTED 或 NEEDS_KEY
+- HERMES_HOME 和 Plugin 安装路径
+- Plugin 状态
+- plugins、gateway、MCP 能力是否可用
+- 本轮 Gateway 重启次数必须为 0</code></pre>
     </div>
 
     <div class="callout good">
       <strong>预期结果：</strong>Plugin 能被 <code>hermes plugins list</code> 发现；
-      <code>not enabled</code> 表示安装成功、正在等待 Bot Token，不是报错。
+      <code>not enabled</code> 表示正在等待一次性最终配置，不是报错。记住
+      Hermes 报告的 Mobius MCP 状态：<code>CONNECTED</code> 或
+      <code>NEEDS_KEY</code>。
     </div>
 
     <div class="gallery">
@@ -361,7 +386,28 @@ https://github.com/Yongcheng123/clickclack-hermes-plugin
       </figure>
     </div>
 
-    <h2>步骤 2：在 ClickClack 创建自己的 Bot</h2>
+    <h2>步骤 2：需要时生成 Mobius Personal Access Token</h2>
+    <p>
+      如果 Prompt 1 报告 <code>CONNECTED</code>，跳过生成 Token，最终 Prompt
+      填 <code>KEEP_EXISTING</code>。如果报告 <code>NEEDS_KEY</code>：
+    </p>
+    <ol class="checklist">
+      <li>
+        打开
+        <a class="primary-link" href="https://mobius.feedmob.com/developers" target="_blank" rel="noreferrer">Mobius → 开发者</a>。
+      </li>
+      <li>找到<strong>你的访问令牌</strong>，名称填写 <code>hermes-workshop</code>。</li>
+      <li>点击<strong>生成</strong>，立即复制只显示一次的 <code>mob_…</code> Token。</li>
+      <li>保留自己的准确 Mobius 显示名，阶段二仍会使用同一个名字。</li>
+    </ol>
+    <div class="callout warn">
+      <strong>Mobius PAT 只显示一次：</strong>不要把真实 <code>mob_…</code>
+      Token 发到 ClickClack、Git、文档或公开群聊。它只粘贴到你自己的
+      Hermes Studio 私人会话中，并由 Hermes 写入权限为 0600 的
+      <code>HERMES_HOME/.env</code>。
+    </div>
+
+    <h2>步骤 3：在 ClickClack 创建自己的 Bot</h2>
     <p>
       进入 <strong>Workspace settings → Automation → Bots &amp; agents</strong>，
       点击 <strong>Add bot</strong>。这部分是网页表单，不是 Prompt，请逐项填写。
@@ -392,29 +438,56 @@ https://github.com/Yongcheng123/clickclack-hermes-plugin
       Token。不要把真实 Token 发到 ClickClack、Git、文档或公开群聊。
     </div>
 
-    <h2>步骤 3：让 Hermes 完成配置和启用</h2>
+    <h2>步骤 4：一次配置 Mobius MCP、Plugin 和 Gateway</h2>
     <p>
       回到刚才同一个 Hermes 会话。确认它已报告
-      <code>clickclack-hermes not enabled</code>，复制下面 Prompt，并且只替换
-      Token 占位符。
+      <code>clickclack-hermes not enabled</code>，复制下面 Prompt，替换
+      Mobius 用户名、Mobius PAT 状态和 ClickClack Bot Token：
     </p>
+    <ul class="checklist">
+      <li>Mobius 已连接：把 <code>&lt;MOBIUS_PAT_OR_KEEP_EXISTING&gt;</code> 替换为 <code>KEEP_EXISTING</code>。</li>
+      <li>Mobius 未连接：替换为刚生成的完整 <code>mob_…</code> Token。</li>
+      <li>把 <code>&lt;PASTE_YOUR_CCB_BOT_TOKEN_HERE&gt;</code> 替换为完整 <code>ccb_…</code> Token。</li>
+    </ul>
 
     <div class="copy-card">
       <div class="copy-bar">
-        <span>Prompt 2 · 完成配置、启用和检查</span>
+        <span>Prompt 2 · 一次配置 Mobius + ClickClack，只重启一次</span>
         <button class="copy-btn" type="button" data-copy="config-prompt">一键复制</button>
       </div>
-      <pre><code id="config-prompt">请继续配置并启用刚安装的 clickclack-hermes。
+      <pre><code id="config-prompt">请在当前 Hermes Studio 一次完成 Mobius MCP 和 ClickClack Plugin 配置。
 
-只操作当前 Studio。下面是我授权用于本次 Workshop 的 Bot Token；收到后直接
-继续，不要要求轮换，也不要在回复或工具输出中显示它。
+只操作当前 Studio。下面的值只授权用于本次 Workshop。不要在回复、工具输出、
+日志或 Git 中显示任何 Token。
 
+MY_MOBIUS_USER_NAME: &lt;YOUR_MOBIUS_USER_NAME&gt;
+MOBIUS_PAT: &lt;MOBIUS_PAT_OR_KEEP_EXISTING&gt;
 CLICKCLACK_BOT_TOKEN: &lt;PASTE_YOUR_CCB_BOT_TOKEN_HERE&gt;
 
 请执行：
-1. 把 Token 安全写入当前 HERMES_HOME/.env，权限设为 0600。
-   不要写入 Plugin 目录、config.yaml、日志或 Git。
-2. 备份现有 config.yaml，再合并下面配置；保留所有其他配置：
+1. 确认使用 Prompt 1 找到的同一个 Profile 和 HERMES_HOME。
+2. 备份现有 config.yaml；后续只做合并，保留所有现有模型、MCP、Gateway、
+   Memory 和其他配置。
+3. 把 CLICKCLACK_BOT_TOKEN 安全写入 HERMES_HOME/.env。
+   - 如果 MOBIUS_PAT 是完整的 mob_… Token，也写为 MOBIUS_PAT；
+   - 如果值是 KEEP_EXISTING，保留当前可用的 Mobius Header 和凭证，不要
+     把 KEEP_EXISTING 写进任何文件。
+   将 .env 权限设为 0600，不要写入 Plugin 目录、日志或 Git。
+4. 如果 Mobius 状态是 NEEDS_KEY，合并以下 MCP 配置。Header 必须引用环境
+   变量，不要把真实 PAT 明文写入 config.yaml：
+
+mcp_servers:
+  mobius:
+    url: "https://mobius.feedmob.com/api/mcp"
+    headers:
+      Authorization: "Bearer ${MOBIUS_PAT}"
+    enabled: true
+    connect_timeout: 60
+    timeout: 120
+
+   如果 Mobius 状态是 CONNECTED 且 MOBIUS_PAT 为 KEEP_EXISTING，保留现有
+   mcp_servers.mobius，不要创建重复条目。
+5. 合并以下 ClickClack 配置：
 
 plugins:
   enabled:
@@ -440,19 +513,29 @@ gateway:
         thread_mode: "always"
         skip_history_on_first_start: true
 
-3. 启用 clickclack-hermes。
-4. 运行 Plugin 自带 doctor。
-5. 重启当前 Hermes Gateway，不要重启其他服务器或容器。
-6. 最后只报告：
+6. 启用 clickclack-hermes，并运行 Plugin 自带 doctor。
+7. 在重启前检查 YAML 可解析、Plugin 配置完整、Mobius MCP 只有一个条目，
+   且两个 Secret 都未出现在 config.yaml 或输出中。
+8. 现在才重启当前 Hermes Gateway 一次；不要重启其他服务器或容器，也不要
+   在此前单独重载或重启 MCP。
+9. Gateway 恢复后：
+   - 验证 ClickClack 显示 connected；
+   - 验证 Mobius MCP 已注册工具；
+   - 调用一次 Mobius list_teams，只读确认能看到“周四练习（THU）”；
+   - 不要在 Mobius 创建、修改或评论 Issue。
+10. 最后只报告：
+   - Mobius 用户名
+   - Mobius MCP 是否 connected，list_teams 是否成功
    - Plugin 是否 enabled
    - Doctor 是否全部 PASS
    - Gateway 是否显示 ClickClack connected
+   - 本次 Gateway 重启次数（必须为 1）
    - 下一步应使用的 Bot handle
 
 如果需要新的 Access，请向我请求，获批后继续。</code></pre>
     </div>
 
-    <h2>步骤 4：在 ClickClack 做 PONG 测试</h2>
+    <h2>步骤 5：在 ClickClack 做 PONG 测试</h2>
     <p>
       回到 <code>#general</code>，手动发送：
       <code>@&lt;YOUR_BOT_HANDLE&gt; 请只回复 PONG</code>。
@@ -460,7 +543,9 @@ gateway:
     </p>
     <div class="callout good">
       <strong>成功标准：</strong>Bot 在对应消息或 Thread 中回复 <code>PONG</code>；
-      不 @ Bot 的普通消息不会触发。
+      不 @ Bot 的普通消息不会触发；Prompt 2 同时报告 Mobius MCP
+      <code>connected</code>，并且 <code>list_teams</code> 能看到
+      <code>周四练习（THU）</code>。
     </div>
 
     <h2>阶段一常见问题</h2>
@@ -469,9 +554,11 @@ gateway:
       <tbody>
         <tr><td><code>not enabled</code></td><td>安装后正常；完成 Token 和配置后才启用。</td></tr>
         <tr><td>没有 plugins 或 gateway</td><td>联系主持人使用备用 Studio。</td></tr>
+        <tr><td>Mobius <code>401/403</code></td><td>在 Mobius 开发者页重新生成 PAT，并替换 <code>HERMES_HOME/.env</code> 中的 <code>MOBIUS_PAT</code>。</td></tr>
+        <tr><td>Mobius 工具未出现</td><td>检查 <code>mcp_servers.mobius</code>、环境变量引用和 Gateway 启动日志；不要添加第二个同名条目。</td></tr>
         <tr><td>Refresh 后仍未加载</td><td>创建新 Session，必要时重启当前 Gateway。</td></tr>
         <tr><td>Bot 在线但不回复</td><td>检查 @handle、Channel 和 Doctor 结果。</td></tr>
-        <tr><td>HTTP 401/403</td><td>生成新 Token 后替换。</td></tr>
+        <tr><td>ClickClack <code>401/403</code></td><td>生成新 Bot Token 后替换。</td></tr>
       </tbody>
     </table>
   </section>
@@ -481,7 +568,8 @@ gateway:
       <h2>阶段二：Bot 自动认领 Issue 并完成 PR</h2>
       <p>
         参与者不需要手动挑选 Issue、手动分配、手动写 PLAN/BLOCKED/READY。
-        只需要填写自己的 Mobius 用户名，把一个 Prompt 发给自己的 Hermes。
+        使用阶段一确认并连接 MCP 时填写的同一个 Mobius 用户名，把一个 Prompt
+        发给自己的 Hermes。
       </p>
     </div>
 
@@ -520,8 +608,9 @@ gateway:
 
     <h2>参与者只需要执行这一步</h2>
     <p>
-      把 <code>&lt;YOUR_MOBIUS_USER_NAME&gt;</code> 替换成 Mobius 里显示的真实姓名。
-      不需要填写 Issue ID；Bot 会从 <code>THU-1</code> 自动找一个可用任务。
+      把 <code>&lt;YOUR_MOBIUS_USER_NAME&gt;</code> 替换成阶段一使用的同一个
+      Mobius 真实姓名。不需要填写 Issue ID；Bot 会从 <code>THU-1</code>
+      自动找一个可用任务。
     </p>
 
     <div class="copy-card">
@@ -645,6 +734,8 @@ Mobius 团队：周四练习（THU）
 
   <div class="footer">
     <strong>版本记录</strong><br>
+    2026-07-29：阶段一增加 Mobius MCP 检查和 PAT 配置；MCP 与 ClickClack
+    Plugin 合并配置后只重启一次 Gateway。<br>
     2026-07-29：合并阶段一和阶段二为双 Tab 页面；阶段二改为单个参与者 Prompt
     自动认领 Issue、更新 Mobius、开发、测试和提交 PR；THU-7 预留给 Yongcheng。<br>
     2026-07-29：创建 Hermes Plugin、Bot 配置和 PONG 操作指南。
