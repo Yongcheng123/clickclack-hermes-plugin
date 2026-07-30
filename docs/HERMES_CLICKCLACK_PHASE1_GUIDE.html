@@ -253,7 +253,7 @@
   <div class="meta">
     <span class="pill">总时长：约 60 分钟</span>
     <span class="pill">7–8 位参与者</span>
-    <span class="pill">公开 Repo + 假数据</span>
+    <span class="pill">公开 Repo + 三源固定快照</span>
     <span class="pill">最后更新：2026-07-29</span>
   </div>
 
@@ -569,7 +569,8 @@ gateway:
       <p>
         参与者不需要手动挑选 Issue、手动分配、手动写 PLAN/BLOCKED/READY。
         使用阶段一确认并连接 MCP 时填写的同一个 Mobius 用户名，把一个 Prompt
-        发给自己的 Hermes。
+        发给自己的 Hermes。当前基线已经包含三张 Chime 数据源、345 条小时记录
+        和完整 18 项指标；参与者只完成各自隔离的 Feature。
       </p>
     </div>
 
@@ -584,6 +585,12 @@ gateway:
       <strong>开始前：</strong>阶段一 PONG 已通过；Hermes 已获得 Mobius 和 GitHub
       访问权限。遇到 Access 请求要及时允许，否则 Bot 会停下来等待。
     </div>
+    <div class="callout good">
+      <strong>当前项目基线：</strong>Repo 已内置 2026-07-24 至 2026-07-28 的
+      三张 Chime FeedTV 固定快照，共 345 条小时记录、18 项指标。Agent_B 在
+      7 月 24 日只有 9/24 小时，这是原始快照中的真实缺口。Workshop 不连接
+      实时 API，也不需要 Beeswax MCP 或生产凭据。
+    </div>
 
     <h2>任务池</h2>
     <p>
@@ -591,13 +598,13 @@ gateway:
       Bot 只会选择没有 Assignee 且仍可开始的子 Issue。
     </p>
     <div class="issue-grid">
-      <div class="issue"><b>THU-2</b> · KPI Cards</div>
-      <div class="issue"><b>THU-3</b> · Hourly Chart</div>
-      <div class="issue"><b>THU-4</b> · Filters</div>
-      <div class="issue"><b>THU-5</b> · Alerts</div>
-      <div class="issue"><b>THU-6</b> · Breakdown Table</div>
+      <div class="issue"><b>THU-2</b> · 6 KPI Cards</div>
+      <div class="issue"><b>THU-3</b> · Gross Spend / Installs Chart</div>
+      <div class="issue"><b>THU-4</b> · Source / Date / Timezone Filters</div>
+      <div class="issue"><b>THU-5</b> · Actionable Alerts</div>
+      <div class="issue"><b>THU-6</b> · Five-day Daily Totals</div>
       <div class="issue reserved"><b>THU-7</b> · Analysis · 已分配 Yongcheng</div>
-      <div class="issue"><b>THU-8</b> · Data Quality</div>
+      <div class="issue"><b>THU-8</b> · Coverage Data Quality</div>
       <div class="issue"><b>THU-9</b> · Workshop Status</div>
     </div>
     <div class="callout warn">
@@ -656,11 +663,12 @@ Mobius 团队：周四练习（THU）
    feat/&lt;CLAIMED_ISSUE_ID&gt;-&lt;SHORT_NAME&gt;
 
 7. 只修改 Issue 明确允许的文件。除非 Issue 明确允许，否则不要修改
-   DashboardShell、globals.css、共享 data/types、package.json 或 lockfile。
-   不要使用生产环境凭证或真实 Campaign 数据。
+   DashboardShell、RawHourlyTable、SourceComparisonTable、globals.css、
+   chime 数据文件、共享 data/types、package.json 或 lockfile。
+   不要使用生产环境凭证，也不要添加仓库快照之外的真实 Campaign 数据。
 
-8. 使用仓库现有的 Fake Data 和视觉风格完成 Acceptance Criteria，并保持
-   Dashboard 响应式和可访问。
+8. 使用仓库现有的三张 Chime 固定快照和视觉风格完成 Acceptance Criteria。
+   不连接实时 API，不伪造 Agent_B 缺失小时，并保持 Dashboard 响应式和可访问。
 
 9. 如果遇到阻塞，由你直接在已认领的 Mobius Issue 添加 BLOCKED 评论，说明
    阻塞原因以及需要的 Access 或决策，然后再向我提问；不要让我手动写评论。
@@ -709,7 +717,9 @@ Mobius 团队：周四练习（THU）
 2. 找出所有以 integration/workshop 为 Base 的 PR，并把每个 PR 与对应的
    THU 子 Issue 匹配。
 3. 逐个检查 PR：是否只修改允许的文件、是否满足 Acceptance Criteria、
-   是否包含 Secret、响应式布局、可访问性、npm run lint 和 npm test。
+   是否包含 Secret、响应式布局、可访问性、npm run lint 和 npm test；同时
+   确认三数据源切换、345 条快照数据、18 项明细表和 Agent_B 9/24 缺口没有
+   被参与者功能破坏。
 4. 如果实现不完整或存在冲突，留下具体的 PR Review 意见，在 Mobius 添加
    BLOCKED Review 评论，并让 Issue 保持 In Review。不要静默重写参与者的功能。
 5. 将通过检查的 PR 逐个合并到 integration/workshop。
@@ -734,6 +744,8 @@ Mobius 团队：周四练习（THU）
 
   <div class="footer">
     <strong>版本记录</strong><br>
+    2026-07-29：同步三张 Chime 固定快照基线；更新 THU-2–THU-9 的实际模块、
+    保护文件、参与者 Prompt 和 Review 验收范围。<br>
     2026-07-29：阶段一增加 Mobius MCP 检查和 PAT 配置；MCP 与 ClickClack
     Plugin 合并配置后只重启一次 Gateway。<br>
     2026-07-29：合并阶段一和阶段二为双 Tab 页面；阶段二改为单个参与者 Prompt
