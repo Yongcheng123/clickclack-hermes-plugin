@@ -356,7 +356,8 @@ https://github.com/Yongcheng123/clickclack-hermes-plugin
       创建名为 <code>hermes-workshop</code> 的访问令牌。Token 只显示一次，
       立即复制，然后把 Prompt 中的
       <code>&lt;UPDATE_YOUR_MOBIUS_PAT&gt;</code> 替换为完整
-      <code>mob_…</code> Token。
+      <code>mob_…</code> Token。只替换占位符，必须保留前面的
+      <code>Bearer </code> 和空格。
     </div>
 
     <div class="copy-card">
@@ -374,11 +375,12 @@ https://github.com/Yongcheng123/clickclack-hermes-plugin
   "type": "http",
   "url": "https://mobius.feedmob.com/api/mcp",
   "headers": {
-    "Authorization": "&lt;UPDATE_YOUR_MOBIUS_PAT&gt;"
+    "Authorization": "Bearer &lt;UPDATE_YOUR_MOBIUS_PAT&gt;"
   }
 }
 
 我已经把 &lt;UPDATE_YOUR_MOBIUS_PAT&gt; 替换为自己的真实 Mobius PAT。
+Authorization 必须保持为 Bearer mob_…，不要删除 Bearer 和它后面的空格。
 不要在回复、命令输出、日志或 Git 中复述这个 Token。
 保留现有模型和其他配置，不要覆盖整个 config.yaml。
 
@@ -517,7 +519,7 @@ timeout，也不要用持续的 logs --follow 等待连接。
       <tbody>
         <tr><td><code>not enabled</code></td><td>安装后正常；完成 Token 和配置后才启用。</td></tr>
         <tr><td>没有 plugins 或 gateway</td><td>联系主持人使用备用 Studio。</td></tr>
-        <tr><td>Mobius <code>401/403</code></td><td>在 Mobius 开发者页重新生成 PAT，用 Prompt 1B 的 HTTP MCP 格式更新同一个 <code>mobius-mcp</code>。</td></tr>
+        <tr><td>Mobius <code>401/403</code></td><td>先确认 Header 是 <code>Authorization: Bearer mob_…</code>；不能直接写 <code>Authorization: mob_…</code>。格式正确仍失败时，再生成新 PAT 并更新同一个 <code>mobius-mcp</code>。</td></tr>
         <tr><td>Mobius 工具未出现</td><td>确认 Prompt 1B 中的 PAT 已替换、URL 没有 Markdown 方括号；统一重载后创建一个新 Session，不要添加第二个同名 MCP。</td></tr>
         <tr><td>Gateway 约 90 秒后下线</td><td>说明它被前台 Terminal 超时终止；根据当前 Hermes 的运行方式安全重载，不要使用 <code>timeout</code> 或让长期 Gateway 绑定在前台 Terminal。</td></tr>
         <tr><td>Refresh 后仍未加载</td><td>创建新 Session，必要时重启当前 Gateway。</td></tr>
@@ -708,6 +710,9 @@ Mobius 团队：周四练习（THU）
 
   <div class="footer">
     <strong>版本记录</strong><br>
+    2026-07-30：修正 Mobius MCP Header；服务端要求
+    <code>Authorization: Bearer mob_…</code>，直接使用
+    <code>Authorization: mob_…</code> 会返回 401。<br>
     2026-07-30：Prompt 2 移除固定 Python 路径和指定脚本命令，改为让 AI
     根据当前 Hermes 的运行方式安全重载 Gateway，提升不同部署环境的兼容性。<br>
     2026-07-30：阶段一不再让 AI 预检测 Mobius；Prompt 1 拆为“已连接”
