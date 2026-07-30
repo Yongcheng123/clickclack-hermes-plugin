@@ -127,20 +127,27 @@ Gateway 同时消费。
 ClickClack 官方 Bot 安装说明：
 [docs.clickclack.chat/bot-installs.html](https://docs.clickclack.chat/bot-installs.html)
 
-### 2. 安装并启用插件
+### 2. 安装插件，等待 Bot Token
 
 Bare metal 或 Hermes profile：
 
 ```bash
-hermes plugins install Yongcheng123/clickclack-hermes-plugin --enable
+hermes plugins install Yongcheng123/clickclack-hermes-plugin --no-enable
 ```
 
-安装器会安全地提示输入 `CLICKCLACK_BOT_TOKEN`。如果安装器没有提示，请把
-Token 写入当前 profile 的 `~/.hermes/.env`，并确保文件权限为 `0600`：
+Workshop 中安装与创建 Bot 可以并行进行。安装完成后显示 `not enabled` 是
+正常的等待状态；收到 Bot Token、完成配置后再统一启用。
+
+Hermes 安装器可能会从 Plugin 的 `.env.example` 自动创建 Plugin 目录中的
+模板 `.env`。该文件可以保留，但不要把真实 Token 写进去。真实 Token 应写入
+当前 profile 的 `HERMES_HOME/.env`，并确保权限为 `0600`：
 
 ```dotenv
 CLICKCLACK_BOT_TOKEN=ccb_REPLACE_ME
 ```
+
+如果安装器在 Bot 创建完成前询问 Token，应跳过并继续安装，不要让安装任务
+停在输入框等待。
 
 不要在共享终端直接运行
 `export CLICKCLACK_BOT_TOKEN=ccb_...`，这可能进入 shell history。
@@ -205,13 +212,21 @@ Doctor 只读取身份、Workspace 和 Channel；不会发送消息，也不会�
 如果使用 Hermes profile，请把 `~/.hermes` 换成该 profile 的实际
 `HERMES_HOME`。
 
-### 5. 重启并验证 Gateway
+### 5. 启用、重启并验证 Gateway
 
 ```bash
-hermes gateway restart
-hermes gateway status
-hermes logs --follow
+hermes plugins enable clickclack-hermes
+python3 "${HERMES_HOME:-$HOME/.hermes}/plugins/clickclack-hermes/scripts/restart_gateway_safely.py" \
+  --hermes-home "${HERMES_HOME:-$HOME/.hermes}"
 ```
+
+`restart_gateway_safely.py` 使用 Hermes 官方 CLI，但把长期运行的 Gateway
+放进独立进程会话，并将输出写入权限受限的日志。这样 Agent Terminal 即使有
+执行超时，也不会把 `SIGTERM` 传给 Gateway。
+
+不要使用 `timeout ... hermes gateway ...`，不要在 Agent Terminal 中以前台
+方式等待 Gateway，也不要用持续的 `logs --follow` 判断启动成功。脚本会执行
+有界检查，并确认启动进程仍然存活且 ClickClack 已连接。
 
 然后在 ClickClack 允许的 Channel 中发送：
 
@@ -233,7 +248,7 @@ Runtime 的持久化 `HERMES_HOME`，不是安装到浏览器容器。
 ```bash
 sudo docker exec -it ahermes-studio \
   /opt/hermes/.venv/bin/hermes plugins install \
-  Yongcheng123/clickclack-hermes-plugin --enable
+  Yongcheng123/clickclack-hermes-plugin --no-enable
 ```
 
 确认持久化目录：
@@ -255,6 +270,8 @@ sudo docker inspect ahermes-studio \
 配置完成后重启 Studio 容器：
 
 ```bash
+sudo docker exec ahermes-studio \
+  /opt/hermes/.venv/bin/hermes plugins enable clickclack-hermes
 sudo docker restart ahermes-studio
 sudo docker logs --since 2m ahermes-studio
 ```

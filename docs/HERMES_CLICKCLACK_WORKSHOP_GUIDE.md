@@ -340,16 +340,20 @@ Doctor 不会发送消息，也不会打印 Token。所有检查必须为 `PASS`
 
 ### 8.2 重启 Gateway
 
-Bare metal：
+在目标 Hermes Runtime 内使用 Plugin 自带的安全重启脚本：
 
 ```bash
-hermes gateway restart
-hermes gateway status
-hermes logs --follow
+python3 "${HERMES_HOME:-$HOME/.hermes}/plugins/clickclack-hermes/scripts/restart_gateway_safely.py" \
+  --hermes-home "${HERMES_HOME:-$HOME/.hermes}"
 ```
 
-Dockerized Studio 可以先尝试 Hermes Gateway restart；如果 Gateway 进程由
-容器管理且无法单独重启，再重启对应容器：
+脚本会在独立进程会话中运行 Gateway，把日志写入
+`HERMES_HOME/logs/gateway-workshop.log`，并在 30 秒内执行有界健康检查。
+禁止使用 `timeout` 包裹 Gateway、在有超时的 Agent Terminal 中前台运行
+Gateway，或用持续的 `logs --follow` 作为启动成功判断。
+
+只有安全重启脚本明确报告当前环境无法持久化 Gateway 时，才由主持人决定是否
+重启对应 Studio 容器：
 
 ```bash
 sudo docker restart ahermes-studio
